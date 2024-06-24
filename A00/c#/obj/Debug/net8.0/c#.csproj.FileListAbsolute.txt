@@ -1,0 +1,14 @@
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/bin/Debug/net8.0/c#
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/bin/Debug/net8.0/c#.deps.json
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/bin/Debug/net8.0/c#.runtimeconfig.json
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/bin/Debug/net8.0/c#.dll
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/bin/Debug/net8.0/c#.pdb
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/obj/Debug/net8.0/c#.GeneratedMSBuildEditorConfig.editorconfig
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/obj/Debug/net8.0/c#.AssemblyInfoInputs.cache
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/obj/Debug/net8.0/c#.AssemblyInfo.cs
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/obj/Debug/net8.0/c#.csproj.CoreCompileInputs.cache
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/obj/Debug/net8.0/c#.dll
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/obj/Debug/net8.0/refint/c#.dll
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/obj/Debug/net8.0/c#.pdb
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/obj/Debug/net8.0/c#.genruntimeconfig.cache
+/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/obj/Debug/net8.0/ref/c#.dll
