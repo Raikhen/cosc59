@@ -1,2 +1,2 @@
-# cosc59
-Repo for COSC 59.
+# COSC 59
+This is the repo.
