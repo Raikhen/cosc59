@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/c#.csproj",
+      "projectUniqueName": "/Users/dylanfridman/cosc59/A00/c#/c#.csproj",
       "projectName": "c#",
-      "projectPath": "/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/c#.csproj",
+      "projectPath": "/Users/dylanfridman/cosc59/A00/c#/c#.csproj",
       "packagesPath": "/Users/dylanfridman/.nuget/packages/",
-      "outputPath": "/Users/dylanfridman/Library/CloudStorage/GoogleDrive-dylanfridman@gmail.com/My Drive/Nerd Shit/Dartmouth/Grad/2nd year/Summer/COSC 59/A00/c#/obj/",
+      "outputPath": "/Users/dylanfridman/cosc59/A00/c#/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/dylanfridman/.nuget/NuGet/NuGet.Config"

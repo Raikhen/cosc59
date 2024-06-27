@@ -29,13 +29,12 @@ def get_prime_partitions(n, bound = 2):
     
     smaller_partitions = get_prime_partitions(n - p, p + 1)
 
-    if len(smaller_partitions) > 0:
-      for partition in smaller_partitions:
-        partition.append(p)
+    for partition in smaller_partitions:
+      partition.append(p)
       
-      partitions += smaller_partitions
+    partitions += smaller_partitions
   
   return partitions
 
-partitions = get_prime_partitions(12)
+partitions = get_prime_partitions(20)
 print(partitions)
