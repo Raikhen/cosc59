@@ -1,0 +1,731 @@
+**A00 - Comparing Languages**
+
+This is a sample write up for the A00_LanguageComparison assignment.
+
+
+<!--
+
+General
+========
+
+For each of your team's implementations, explain the following (where appropriate and applicable):
+
+- details on calling conventions, input and output data formats, limitations, bugs, and special features.
+- negative aspects of your program (limitations, known bugs)
+- positive aspects (extensions, special features)
+- describe your choice of modularization (abstractions), data structures, and algorithms
+- explain anything you did that is likely to be different from what other students may have done
+- justify any design decisions for which the rationale isn't immediately clear
+
+Feel free to modify the structure of this `readme.html` file to fit the current assignment and to fit how you wish to present your findings.
+
+
+Submission
+-----------
+
+
+Create a zip file that contains all of your code, this `readme.html` document, and any additional files of evidence (ex: screenshots).
+
+Use folders to divide up the subparts of your submission.
+For example, your zip file could look like the following:
+
+~~~~
+readme.html
+ada/
+    primepartitions.adb
+    screenshot.png
+go/
+    primepartitions.go
+    screenshot.png
+haskell/
+    primepartitions.hs
+    screenshot.png
+prolog/
+    primepartitions.pl
+    screenshot.png
+python/
+    primepartitions.py
+    screenshot.png
+~~~~
+-->
+
+
+Author
+=============
+
+<!-- Note: wrapping table in div.noheader will hide the table's header -->
+<!-- Note: wrapping table in div.firstcol will style the first column different from other columns -->
+<div class="noheader firstcol">
+                  |             
+------------------|-------------
+name              | Sebastian Frazier
+computer + OS     | macOS Big Sur
+time to complete  | ~7 hours
+partner           | Dylan Fridman
+additional help   | Rosetta Code examples
+</div>
+
+
+
+Prime Partitions
+=================
+
+42 has 15 prime partitions, and they are...
+
+2 + 3 + 5 + 13 + 19,
+
+2 + 3 + 7 + 11 + 19,
+
+2 + 3 + 7 + 13 + 17,
+
+2 + 3 + 37,
+
+2 + 5 + 7 + 11 + 17,
+
+2 + 11 + 29,
+
+2 + 17 + 23,
+
+3 + 5 + 11 + 23,
+
+3 + 7 + 13 + 19,
+
+5 + 7 + 11 + 19,
+
+5 + 7 + 13 + 17,
+
+5 + 37,
+
+11 + 31,
+
+13 + 29,
+
+19 + 23,
+
+
+Implementations
+================
+
+
+Language: Ada
+--------------------------------
+
+The implementation in ADA went interestingly. Dylan and I's first strategy was proven to be quite ineffective. One key reason for this was
+that we had intended to use an array of array of partitions but realized we couldn't set the max size for this and so our thought to use
+booleans for each array was ineffective. This is because the bound for # of distinct prime partitions is quite large and would way overallocate
+space and overall be an ineffective solution. Interestingly, I found out that there is a new asymptotic bound on the number of prime partitions
+as per a research paper from I think 2022 which was really cool to see given I have a big interest in combinatorics. Although we didn't end up
+using this information, it was pretty cool to find it out and read that paper seeing if we could implement it.
+__________________________
+with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Numerics; use Ada.Numerics;
+with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
+with Ada.Containers.Vectors;
+
+procedure Prime_Partitions is
+  package Natural_List is new
+    Ada.Containers.Vectors
+      (Index_Type => Natural,
+      Element_Type => Natural);
+  
+  package Partition_List is new
+    Ada.Containers.Vectors
+      (Index_Type => Natural,
+      Element_Type => Natural_List.Vector,
+      "=" => Natural_List."=");
+
+  -- Check if a number is prime
+  function Is_Prime (K : Integer) return Boolean is
+  begin
+    if K < 2 then
+      return False;
+    end if;
+    
+    for I in 2 .. Integer(Sqrt(Float(K))) loop
+      if K mod I = 0 then
+        return False;
+      end if;
+    end loop;
+    
+    return True;
+  end Is_Prime;
+
+  -- Get all the primes in between A and B
+  function Get_Primes (A, B : Integer) return Natural_List.Vector is
+    Primes : Natural_List.Vector;
+  begin
+    for I in A .. B loop
+      if Is_Prime(I) then
+        Primes.Append(I);
+      end if;
+    end loop;
+    
+    return Primes;
+  end Get_Primes;
+
+  -- Get all the prime partitions of K where every element is at least Lower_Bound
+  function Get_Prime_Partitions (K : Integer; Lower_Bound : Integer := 2) return Partition_List.Vector is
+    Partitions : Partition_List.Vector;
+    Sub_Partitions : Partition_List.Vector;
+    Primes : Natural_List.Vector := Get_Primes(Lower_Bound, K);
+  begin
+    if K < 2 then
+      return Partitions;
+    end if;
+
+    for P of Primes loop
+      if P = K then
+        declare
+          New_Partition : Natural_List.Vector;
+        begin
+          New_Partition.Append(P);
+          Partitions.Append(New_Partition);
+        end;
+      else
+        Sub_Partitions := Get_Prime_Partitions(K - P, P + 1);
+
+        for Partition of Sub_Partitions loop
+          declare
+            New_Partition : Natural_List.Vector;
+          begin
+            
+            New_Partition.Append(P);
+            
+            for E of Partition loop
+              New_Partition.Append(E);
+            end loop;
+
+            Partitions.Append(New_Partition);
+          end;
+        end loop;
+      end if;
+    end loop;
+
+    return Partitions;
+  end Get_Prime_Partitions;
+
+  function To_String (K : Natural) return String is
+  begin
+    return K'Image (2 .. K'Image'Last);
+  end To_String;
+
+  procedure Print_Prime_Partitions (K : Integer) is
+    Partitions : Partition_List.Vector := Get_Prime_Partitions(K);
+  begin
+    for Partition of Partitions loop
+      Put(To_String(K) & " = ");
+
+      for P of Partition loop
+        Put (To_String(P));
+
+        if P /= Partition.Last_Element then
+          Put (" + ");
+        end if;
+      end loop;
+
+      Put_Line (" (" & To_String(Natural(Partition.Length)) & ")");
+    end loop;
+
+    Put_Line (To_String(K) & " has " & To_String(Natural(Partitions.Length)) & " prime partitions");
+  end Print_Prime_Partitions;
+begin
+  Print_Prime_Partitions(20);
+end Prime_Partitions;
+
+![](ada/screenshot.png width="600px")
+
+Language: Haskell
+--------------------------------
+
+import Data.List
+
+-- Checks if n has divisors in 2..k
+hasDivisors :: Integer -> Integer -> Bool
+hasDivisors n k
+  | k > 1   = mod n k == 0 || hasDivisors n (k - 1)
+  | k <= 1  = False
+
+-- Checks if n is a prime number
+isPrime :: Integer -> Bool
+isPrime n
+  | n > 1   = not (hasDivisors n (n - 1))
+  | n < 0   = isPrime (-n)
+  | n == 1  = False
+  | n == 0  = False
+
+-- Get all primes in between m and n
+getPrimes :: Integer -> Integer -> [Integer]
+getPrimes m n
+  | n < m                 = []
+  | n >= m  && isPrime m  = m : getPrimes (m + 1) n
+  | otherwise             = getPrimes (m + 1) n
+
+-- Append a number to every partition
+appendToPartitions :: Integer -> [[Integer]] -> [[Integer]]
+appendToPartitions p = map (p :)
+
+{-
+DISCLAIMER:
+I originally wrote appendToPartitions using pattern matching, as follows
+
+appendToPartitions p [] = []
+appendToPartitions p (y : ys) = (p : y) : appendToPartitions p ys
+
+and the linter suggested rewriting it using the map function and using the eta
+reduction from p ys = map (p :) ys.
+-}
+
+-- Get prime partitions that contain a given value p
+getPrimePartitionsAux :: Integer -> Integer -> Integer -> [[Integer]]
+getPrimePartitionsAux n lb p
+  | p == n = [[p]]
+  | p /= n = appendToPartitions p (getPrimePartitions (n - p) (p + 1))
+
+-- Get prime partitions
+getPrimePartitions :: Integer -> Integer -> [[Integer]]
+getPrimePartitions n lb
+  | n < 2 || null primes =  []
+  | n >= 2 && not (null primes) = getPrimePartitionsAux n lb (head primes) ++ getPrimePartitions n (head primes + 1)
+    where
+      primes = getPrimes lb n
+
+printPartitions :: Integer -> [[Integer]] -> IO ()
+printPartitions n [] = do return ()
+printPartitions n (y : ys) = do
+  putStrLn (show n ++ " = " ++ sum ++ " (" ++ show (length y) ++ ")")
+  printPartitions n ys
+  where
+    sum = intercalate " + " (map show y)
+
+main :: IO ()
+main = do
+  printPartitions n partitions
+  putStrLn (show n ++ " has " ++ show (length partitions) ++ " prime partitions")
+  where
+    n = 42
+    partitions = getPrimePartitions n 2
+
+![](haskell/screenshot.png width="600px")
+
+Language: C#
+--------------------------------
+
+using System;
+
+class Program {
+  static bool IsPrime(int n) {
+    if (n < 2) {
+      return false;
+    }
+
+    for (int i = 2; i * i <= n; i++) {
+      if (n % i == 0) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  static List<int> GetPrimes(int lowerBound, int upperBound) {
+    List<int> primes = new List<int>();
+
+    for (int i = lowerBound; i <= upperBound; i++) {
+      if (IsPrime(i)) {
+        primes.Add(i);
+      }
+    }
+
+    return primes;
+  }
+
+  static List<List<int>> GetPrimePartitions(int n, int bound = 2) {
+    List<List<int>> partitions = new List<List<int>>();
+    List<int> primes = GetPrimes(bound, n);
+
+    if (n < 2) {
+      return partitions;
+    }
+
+    for (int i = 0; i < primes.Count; i++) {
+      int p = primes[i];
+
+      if (n == p) {
+        partitions.Add(new List<int> { p });
+      } else {
+        List<List<int>> subPartitions = GetPrimePartitions(n - p, p + 1);
+
+        if (subPartitions.Count > 0) {
+          for (int j = 0; j < subPartitions.Count; j++) {
+            List<int> partition = subPartitions[j];
+            partition.Add(p);
+          }
+
+          partitions.AddRange(subPartitions);
+        }
+      }
+    }
+
+    return partitions;
+  }
+
+  static void PrintPrimePartitions(int n) {
+    List<List<int>> partitions = GetPrimePartitions(n);
+
+    for (int i = 0; i < partitions.Count; i++) {
+      List<int> partition = partitions[i];
+      Console.Write($"{n} = ");
+
+      for (int j = 0; j < partition.Count; j++) {
+        Console.Write(partition[j]);
+        Console.Write(j < partition.Count - 1 ? " + " : "");
+      }
+
+      Console.Write($" ({partition.Count})\n");
+    }
+
+    Console.WriteLine($"{n} has {partitions.Count} prime partitions\n");
+  }
+
+  static void Main(string[] args) {
+    PrintPrimePartitions(42);
+  }
+}
+
+![](csharp/screenshot.png width="600px")
+
+Language: Ruby
+--------------------------------
+
+This was Dylan's language to do but I'm interested as to why he chose Ruby and not Jscript given Jscript is so simple. Either way, it reminds me of a 
+weird cross between Python and C or something. Pretty cool one.
+_____________________________
+def is_prime(n)
+  if n < 2
+    return false
+  end
+
+  for m in 2..(n - 1)
+    if n % m == 0
+      return false
+    end
+  end
+
+  return true
+end
+
+def get_primes(lower_bound, upper_bound)
+  list = []
+
+  for p in lower_bound..upper_bound
+    if is_prime(p)
+      list.append(p)
+    end
+  end
+
+  return list
+end
+
+def get_prime_partitions(n, bound = 2)
+  partitions = []
+  primes = get_primes(bound, n)
+
+  if n < 2
+    return []
+  end
+
+  for p in primes
+    if n == p
+      partitions += [[p]]
+    end
+
+    smaller_partitions = get_prime_partitions(n - p, p + 1)
+
+    for partition in smaller_partitions
+      partition.append(p)
+    end
+
+    partitions = partitions + smaller_partitions
+  end
+
+  return partitions
+end
+
+def print_prime_partitions(n)
+  partitions = get_prime_partitions(n)
+
+  if partitions.length == 0
+    puts "There are no prime partitions of #{n}"
+  else
+    for partition in partitions
+      puts "#{n} = #{partition.join(" + ")} (#{partition.length})"
+    end
+
+    puts "#{n} has #{partitions.length} prime partitions"
+  end
+end
+
+n = -5
+print_prime_partitions(n)
+
+![](ruby/screenshot.png width="600px")
+
+Language: Prolog
+--------------------------------
+
+Wow this language is really weird and really cool. I'd never seen logic programming like this before. It's extremely peculiar to write
+functions as definitions in the manner that this seems to require. It's almost like writing a ruleset for a game instead of coding. It feels
+very different to use and looks somewhat funny (I don't find Prolog to be very readable) but how it works is really cool. I had a little
+trouble with the defining primes weirdly at first and also some issues with printing at points, other than that it took some time but wasn't
+too bad.
+________________________________________
+% Define primes with following rules
+isPrime(N) :-
+  N < 2,
+  !,
+  fail.
+isPrime(2) :-
+  !.
+isPrime(N) :-
+  N > 2,
+  \+ hasFactor(N, 2).
+
+% Define if a number is divisible by others
+hasFactor(N, X) :-
+  X * X =< N,
+  (N mod X =:= 0;
+   X2 is X + 1,
+   hasFactor(N, X2)).
+
+% Generate a list of primes, L is a list to store
+getPrimes(X, Y, L) :- getPrimes(X, Y, [], L). % Helper with new empty list
+getPrimes(X, Y, L, Lp) :-
+  (X > Y ->
+      Lp = L; % If X is greater than Y, set Lp to our empty List
+   Yp is Y - 1,
+   (isPrime(Y) ->
+     getPrimes(X, Yp, [Y | L], Lp); % If Y is prime, add it to the list
+     getPrimes(X, Yp, L, Lp))).
+
+% Add partitions for determining combinations
+addPartition(P, [H | T]) :-
+  addPartition(Pp, T),
+  P is H + Pp. % Add new number to partition
+addPartition(0, []). % Base case with empty list.
+
+% Find all subsets of a list to assist our partitions
+subset([], []). % Empty set has no partitions except itself
+subset([H | T], [H | Tp]) :-
+  subset(T, Tp). % Find partitions w/ head
+subset([_ | T], Tp) :-
+  subset(T, Tp). % Find partitions w/o head
+
+% Create distinct prime partitions
+getPrimePartitions(N) :-
+  getPrimes(1, N, PL), % Get a list PL (Prime List) of all primes from 1 to N
+  findall(L, (subset(PL, L), addPartition(P, L), P =:= N), Ls), % Get all possible partitions
+  sort(Ls, SL), % Sort the list
+  length(SL, NP), % Get number of partitions
+  printPrimePartitions(SL, N, NP). % Print from the sorted list
+
+% Print number of partitions
+printPrimePartitions(PL, N, NP) :-
+  format('~d has ~d prime partitions.~n', [N, NP]), % Print the number of partitions
+  printPartitions(PL). % Print all partitions
+
+% Print all our partitions in correct format
+printPartitions([]).
+printPartitions([H | T]) :-
+printPartition(H), % Print one node (the head)
+  nl,
+  printPartitions(T). % Recall for tail.
+
+% Print each partition
+printPartition([H | T]) :-
+  length(T, S), % Get current length of our tail
+  (S =:= 0 ->
+     format('~d', [H]); % If our tail is empty, just print the value
+     format('~d + ', [H])), % Else, print value with a plus sign
+  printPartition(T).
+printPartition([]). % Base case
+
+![](prolog/screenshot.png width="600px")
+
+Language: Scheme (extra credit)
+--------------------------------
+
+<!-- Details, source code, and screenshots here -->
+
+!(scheme/screenshot.png width="600px")
+
+; Checks if n has divisors in 2..k
+(define (has-divisors n k)
+  (if (= k 1)
+    #f
+    (if (= (remainder n k) 0)
+      #t
+      (has-divisors n (- k 1)))))
+
+; Checks if n is prime
+(define (is-prime n)
+  (if (= n 1)
+    #f
+    (not (has-divisors n (- n 1)))))
+
+; Returns a list of prime numbers between m and n, inclusive
+(define (get-primes m n)
+  (if (< n m)
+    '()
+    (if (is-prime m)
+      (cons m (get-primes (+ m 1) n))
+      (get-primes (+ m 1) n))))
+
+; Appends p to every partition in a list of partitions
+(define (append-to-partitions p partitions)
+  (map (lambda (partition) (cons p partition)) partitions))
+
+; Returns the prime partitions of n containing p where every element >= p
+(define (get-prime-partitions-with-p n lower-bound p)
+  (if (= p n)
+    (cons (cons p '()) '())
+    (append-to-partitions p (get-prime-partitions (- n p) (+ p 1)))))
+
+; Returns the prime partitions of n where every element >= p
+(define (get-prime-partitions n lower-bound)
+  (if (or (< n 2) (= 0 (length (get-primes lower-bound n))))
+    '()
+    (append (get-prime-partitions-with-p n lower-bound (car (get-primes lower-bound n)))
+      (get-prime-partitions n (+ 1 (car (get-primes lower-bound n)))))))
+
+; Intercalates a list of strings with a separator
+(define (intercalate s l)
+  (if (= 1 (length l))
+    (car l)
+    (string-append (car l) s (intercalate s (cdr l)))))
+
+; Converts a partition to a string
+(define (partition-to-string n partition)
+  (string-append
+    (number->string n)
+    " = "
+    (intercalate " + " (map number->string partition))
+    " ("
+    (number->string (length partition))
+    ")\n"))
+
+; Converts a list of partitions to a string
+(define (partitions-to-string n partitions)
+  (if (null? partitions)
+    ""
+    (string-append
+      (partition-to-string n (car partitions))
+      (partitions-to-string n (cdr partitions)))))
+
+(define N 20)
+
+(display (partitions-to-string N (get-prime-partitions N 2)))
+(display (string-append
+  (number->string N)
+  " has "
+  (number->string (length (get-prime-partitions N 2)))
+  " prime partitions"))
+
+; wow, this language sucks...
+
+![](scheme/screenshot.png width="600px")
+
+Assignment Reflection
+======================
+
+<!-- Note: wrapping table in div.noheader will hide the table's header -->
+<!-- Note: wrapping table in div.firstcol will style the first column different from other columns -->
+<div class="noheader firstcol">
+                        |     
+------------------------|-----
+Ada                     | Having to define bounds for variables is cool but annoying, it actually created some problems for us
+Haskell                 | It looks very scary
+C#                      | Great for most programs. I always think of c# as a very all around language, much like C or Python or Java. It can do most things though is less efficient than its big brother
+Ruby                    | JavaScript is better boooooooo.
+Prolog                  | Really Really Cool. Seems great for anything with lots of calculation.
+Scheme (extra)          | Gross.
+</div>
+
+
+<!--
+How do the languages compare to one another?
+Which language was your favorite?  Which was your least favorite?
+What type of problems would each language be good at solving?
+When you had a choice of language, why did you decide on the language in which you implemented your solution?
+If you worked with a partnor, how did you decide to split up the work?
+
+List any other comments below.
+Feel free to provide any feedback on how much you learned from doing the assignment, and whether you enjoyed doing it.
+-->
+
+The languages are all somewhat different. I see quite a few similarities between the code in Haskell/Scheme and Ruby/C# but Prolog and Ada are
+very different from the rest. I didn't realize quite how hard translating code can be, especially when languages are stylistically entirely
+different. Coding in Prolog for instance felt nothing like what I usually do in, say, python.
+
+My favorite was Prolog (probably) because it was just so novel. I didn't code in Scheme but after reading Dylan's that one is definitely
+my least favorite (LOL).
+
+I can imagine Prolog being really really good for algorithmic and mathematical work because its so logical and 'step by step' in a way. It
+is a little tricky to get used to but it seems very effective for mathematical stuff.
+
+Ruby and C# (as is to be expected) seem best for more general coding, software engineering and website development.
+
+I don't know what I'd use Ada for (probably not much) but apparently it was developed by the DoD so that's pretty cool.
+
+I Didn't do the one's that gave an option but I have absolutely no clue why Dylan chose ruby instead of Jscript. C# I also would have chosen
+because I have a lot of experience in C and so I feel as if C# would be easy to pick up because I've already worked with its basis. 
+
+We tried to split up the work based on which languages were harder. We assumed based on what we were told in class that Ada and Prolog would take
+the longest, as such we decided to work on one of them together and then give one of us the other one. I took Prolog because I thought it looked
+really cool. Dylan did the other 3 in the meantime (he had also already done 2 before we decided to partner which made it much easier). Because Ruby and Haskell were already done 
+when we were allocating work, we decided to split it up where I take prolog, we split Ada, and Dylan took C# and whoever had more time did Scheme.
+
+<!--   Feel free to modify the following to fit a theme of your choosing   -->
+<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet"> <!-- a sans-serif font -->
+<style>  /* A TAYLOR-INSPIRED THEME */
+    body {font-family:'Open Sans',sans-serif;}
+    .md a:link, .md a:visited {color:hsl(252,23.0%,44.3%); font-family:'Open Sans',sans-serif;}
+    .md table.table th {background-color:hsl(252,23.0%,44.3%);}
+    .md .noheader th {display:none;}
+    .md .firstcol td:first-child {white-space:pre;color:white;vertical-align:top;font-weight:bold;border-color:black;background:hsl(252,23.0%,54.3%);}
+    .md .firstcol tr:nth-child(even) td:first-child {background:hsl(252,23.0%,44.3%);}
+</style>
+
+
+<!-- ****************************** -->
+<!--    Leave the content below     -->
+<!-- ****************************** -->
+
+<!-- The script and style below are added for clarity and to workaround a bug -->
+<script>
+    // this is a hack to workaround a bug in Markdeep+Mathjax, where
+    // `$`` is automatically converted to `\(`` and `\)`` too soon.
+    // the following code will replace the innerHTML of all elements
+    // with class "dollar" with a dollar sign.
+    setTimeout(function() {
+        var dollars = document.getElementsByClassName('dollar');
+        for(var i = 0; i < dollars.length; i++) {
+            dollars[i].innerHTML = '&#' + '36;'; // split to prevent conversion to $
+        }
+    }, 1000);
+</script>
+<style>
+    /* adding some styling to <code> tags (but not <pre><code> coding blocks!) */
+    :not(pre) > code {
+        background-color: rgba(0,0,0,0.05);
+        outline: 1px solid rgba(0,0,0,0.15);
+        margin-left: 0.25em;
+        margin-right: 0.25em;
+    }
+    /* fixes table of contents of medium-length document from looking weird if admonitions are behind */
+    .md div.mediumTOC { background: white; }
+    .md div.admonition { position: initial !important; }
+</style>
+
+<!--   Leave the following Markdeep formatting code, as this will format your text above to look nice in a wed browser   -->
+
+<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
