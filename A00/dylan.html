@@ -498,10 +498,85 @@ print_prime_partitions(n)
 Language: Prolog
 --------------------------------
 
-TBD...
+Sebastian was able to find a neat way to print the prime partitions despite it not being required by the assignment.
 
-<!-- Details, source code, and screenshots here -->
-<!-- Include screenshot showing prime partitions of 42 -->
+~~~~
+% Author - Sebastian Frazier & Dylan Fridman
+% CS59 A00 - Lang Comp - Prolog Module
+% This program defines an implementation of distinct prime partitions in Prolog
+
+% Define primes with following rules
+isPrime(N) :-
+  N < 2,
+  !,
+  fail.
+isPrime(2) :-
+  !.
+isPrime(N) :-
+  N > 2,
+  \+ hasFactor(N, 2).
+
+% Define if a number is divisible by others
+hasFactor(N, X) :-
+  X * X =< N,
+  (N mod X =:= 0;
+   X2 is X + 1,
+   hasFactor(N, X2)).
+
+% Generate a list of primes, L is a list to store
+getPrimes(X, Y, L) :- getPrimes(X, Y, [], L). % Helper with new empty list
+getPrimes(X, Y, L, Lp) :-
+  (X > Y ->
+      Lp = L; % If X is greater than Y, set Lp to our empty List
+   Yp is Y - 1,
+   (isPrime(Y) ->
+     getPrimes(X, Yp, [Y | L], Lp); % If Y is prime, add it to the list
+     getPrimes(X, Yp, L, Lp))).
+
+% Add partitions for determining combinations
+addPartition(P, [H | T]) :-
+  addPartition(Pp, T),
+  P is H + Pp. % Add new number to partition
+addPartition(0, []). % Base case with empty list.
+
+% Find all subsets of a list to assist our partitions
+subset([], []). % Empty set has no partitions except itself
+subset([H | T], [H | Tp]) :-
+  subset(T, Tp). % Find partitions w/ head
+subset([_ | T], Tp) :-
+  subset(T, Tp). % Find partitions w/o head
+
+% Create distinct prime partitions
+getPrimePartitions(N) :-
+  getPrimes(1, N, PL), % Get a list PL (Prime List) of all primes from 1 to N
+  findall(L, (subset(PL, L), addPartition(P, L), P =:= N), Ls), % Get all possible partitions
+  sort(Ls, SL), % Sort the list
+  length(SL, NP), % Get number of partitions
+  printPrimePartitions(SL, N, NP). % Print from the sorted list
+
+% Print number of partitions
+printPrimePartitions(PL, N, NP) :-
+  format('~d has ~d prime partitions.~n', [N, NP]), % Print the number of partitions
+  printPartitions(PL). % Print all partitions
+
+% Print all our partitions in correct format
+printPartitions([]).
+printPartitions([H | T]) :-
+printPartition(H), % Print one node (the head)
+  nl,
+  printPartitions(T). % Recall for tail.
+
+% Print each partition
+printPartition([H | T]) :-
+  length(T, S), % Get current length of our tail
+  (S =:= 0 ->
+     format('~d', [H]); % If our tail is empty, just print the value
+     format('~d + ', [H])), % Else, print value with a plus sign
+  printPartition(T).
+printPartition([]). % Base case
+~~~~
+
+![A screenshot showing Prolog running the Prime Partitions program.](prolog/screenshot2.png width="600px")
 
 Language: Scheme (extra credit)
 --------------------------------
@@ -596,7 +671,7 @@ Ada                     | Although I get that this language is a bit safer than 
 OCaml, Haskell          | I chose Haskell out of comfort since I had already programmed a tiny bit on it and enjoyed it. It seems like it'd be a good language to solve recursive problems.
 C#, Go, Rust            | I chose C# out of comfort since I had already programmed a tiny bit on it and enjoyed it. I think C# would shine in bigger applications, for something as simple as the prime partitions problem, there's truly no need for OOP.
 JavaScript, Perl, Ruby  | I didn't really choose Ruby: I got scared away from JS. It was my favorite language because it allows for faster coding than the alternatives in my opinion.
-Prolog                  | TBD
+Prolog                  | Prolog seems like a great language to solve some problems. Sebastian's implementation feels somewhat functional but at times it's able to use Prolog's power, as evidenced by the use of "findall" in greatPrimePartitions.
 Scheme (extra)          | My least favorite language by far. I think it'd be impossible to use for anything moderately complex due to all the time one would waste counting parentheses. I don't see any reason why anybody would choose to code in Scheme instead of Haskell.
 </div>
 

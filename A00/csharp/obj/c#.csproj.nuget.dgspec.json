@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/dylanfridman/cosc59/A00/c#/c#.csproj": {}
+    "/Users/dylanfridman/cosc59/A00/csharp/c#.csproj": {}
   },
   "projects": {
-    "/Users/dylanfridman/cosc59/A00/c#/c#.csproj": {
+    "/Users/dylanfridman/cosc59/A00/csharp/c#.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/dylanfridman/cosc59/A00/c#/c#.csproj",
+        "projectUniqueName": "/Users/dylanfridman/cosc59/A00/csharp/c#.csproj",
         "projectName": "c#",
-        "projectPath": "/Users/dylanfridman/cosc59/A00/c#/c#.csproj",
+        "projectPath": "/Users/dylanfridman/cosc59/A00/csharp/c#.csproj",
         "packagesPath": "/Users/dylanfridman/.nuget/packages/",
-        "outputPath": "/Users/dylanfridman/cosc59/A00/c#/obj/",
+        "outputPath": "/Users/dylanfridman/cosc59/A00/csharp/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/dylanfridman/.nuget/NuGet/NuGet.Config"
