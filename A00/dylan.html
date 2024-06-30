@@ -1,0 +1,663 @@
+**A00 - Comparing Languages**
+
+<!--
+
+General
+========
+
+For each of your team's implementations, explain the following (where appropriate and applicable):
+
+- details on calling conventions, input and output data formats, limitations, bugs, and special features.
+- negative aspects of your program (limitations, known bugs)
+- positive aspects (extensions, special features)
+- describe your choice of modularization (abstractions), data structures, and algorithms
+- explain anything you did that is likely to be different from what other students may have done
+- justify any design decisions for which the rationale isn't immediately clear
+
+Feel free to modify the structure of this `readme.html` file to fit the current assignment and to fit how you wish to present your findings.
+
+Submission
+-----------
+
+
+Create a zip file that contains all of your code, this `readme.html` document, and any additional files of evidence (ex: screenshots).
+
+Use folders to divide up the subparts of your submission.
+For example, your zip file could look like the following:
+
+~~~~
+readme.html
+ada/
+    primepartitions.adb
+    screenshot.png
+go/
+    primepartitions.go
+    screenshot.png
+haskell/
+    primepartitions.hs
+    screenshot.png
+prolog/
+    primepartitions.pl
+    screenshot.png
+python/
+    primepartitions.py
+    screenshot.png
+~~~~
+-->
+
+
+Author
+=============
+
+<div class="noheader firstcol">
+                  |             
+------------------|-------------
+name              | Dylan Fridman
+computer + OS     | MacBook Air + macOS Sonoma
+time to complete  | 15 hours
+partner           | Sebastian Frazier
+</div>
+
+
+
+Prime Partitions
+=================
+
+42 has 15 prime partitions, and they are:
+
+42 = 19 + 13 + 5 + 3 + 2 (5)
+
+42 = 19 + 11 + 7 + 3 + 2 (5)
+
+42 = 17 + 13 + 7 + 3 + 2 (5)
+
+42 = 37 + 3 + 2 (3)
+
+42 = 17 + 11 + 7 + 5 + 2 (5)
+
+42 = 29 + 11 + 2 (3)
+
+42 = 23 + 17 + 2 (3)
+
+42 = 23 + 11 + 5 + 3 (4)
+
+42 = 19 + 13 + 7 + 3 (4)
+
+42 = 19 + 11 + 7 + 5 (4)
+
+42 = 17 + 13 + 7 + 5 (4)
+
+42 = 37 + 5 (2)
+
+42 = 31 + 11 (2)
+
+42 = 29 + 13 (2)
+
+42 = 23 + 19 (2)
+
+
+
+Implementations
+================
+
+I implemented the prime partitions program in Ruby, C#, Haskell, and Scheme.
+Sebastian and I worked together on the Ada version and Sebastian did the Prolog version on his own.
+I first coded the Ruby version and then used it as a source of inspiration for the other imperative languages: C# and Ada.
+For the functional languages, I first did it in Haskell and then did it in Scheme.
+I tried my best to respect the naming conventions of each language.
+My code is very, very far from being efficient.
+Instead of obtaining the primes by doing something relatively fast like the Sieve of Eratosthenes,
+I just made a function to check if a number is prime
+(that in some cases runs in O(n) instead of O(sqrt(n)) just to keep it as simple as possible).
+I didn't even store the values, so the function to get a bounded list of primes is computed every time.
+I did it this way because it was more than sufficient to obtain the prime partitions of 42 and
+I didn't want to needlessly complicate things.
+
+I tried to keep the code relatively modular by defining functions/methods even if
+there was only one other function that called it to make the code as clear as possible.
+The only cases where I see I could have done a better job modularizing the code is
+in printing the partitions on both functional languages.
+Another thing I could have done differently is to actually write the C# program
+using OOP by making a class called prime partition.
+However, that seemed kind of silly considering the simplicity of the program.
+
+Language: Ada
+--------------------------------
+
+At first, Sebastian and I tried to store the partitions as matrix of booleans
+where each entry tells you if a given prime is/isn't in a given partition.
+However, this proved to be a terrible idea.
+In particular, I really disliked the fact that we had to "guess" one of the dimensions of the matrix
+since it's tricky to upper-bound the number of prime partitions.
+Once we switched to using vectors, everything turned out to be quite easy.
+
+~~~~
+with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Numerics; use Ada.Numerics;
+with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
+with Ada.Containers.Vectors;
+
+procedure Prime_Partitions is
+  package Natural_List is new
+    Ada.Containers.Vectors
+      (Index_Type => Natural,
+      Element_Type => Natural);
+  
+  package Partition_List is new
+    Ada.Containers.Vectors
+      (Index_Type => Natural,
+      Element_Type => Natural_List.Vector,
+      "=" => Natural_List."=");
+
+  -- Check if a number is prime
+  function Is_Prime (K : Integer) return Boolean is
+  begin
+    if K < 2 then
+      return False;
+    end if;
+    
+    for I in 2 .. Integer(Sqrt(Float(K))) loop
+      if K mod I = 0 then
+        return False;
+      end if;
+    end loop;
+    
+    return True;
+  end Is_Prime;
+
+  -- Get all the primes in between A and B
+  function Get_Primes (A, B : Integer) return Natural_List.Vector is
+    Primes : Natural_List.Vector;
+  begin
+    for I in A .. B loop
+      if Is_Prime(I) then
+        Primes.Append(I);
+      end if;
+    end loop;
+    
+    return Primes;
+  end Get_Primes;
+
+  -- Get all the prime partitions of K where every element is at least Lower_Bound
+  function Get_Prime_Partitions (K : Integer; Lower_Bound : Integer := 2) return Partition_List.Vector is
+    Partitions : Partition_List.Vector;
+    Sub_Partitions : Partition_List.Vector;
+    Primes : Natural_List.Vector := Get_Primes(Lower_Bound, K);
+  begin
+    if K < 2 then
+      return Partitions;
+    end if;
+
+    for P of Primes loop
+      if P = K then
+        declare
+          New_Partition : Natural_List.Vector;
+        begin
+          New_Partition.Append(P);
+          Partitions.Append(New_Partition);
+        end;
+      else
+        Sub_Partitions := Get_Prime_Partitions(K - P, P + 1);
+
+        for Partition of Sub_Partitions loop
+          declare
+            New_Partition : Natural_List.Vector;
+          begin
+            
+            New_Partition.Append(P);
+            
+            for E of Partition loop
+              New_Partition.Append(E);
+            end loop;
+
+            Partitions.Append(New_Partition);
+          end;
+        end loop;
+      end if;
+    end loop;
+
+    return Partitions;
+  end Get_Prime_Partitions;
+
+  function To_String (K : Natural) return String is
+  begin
+    return K'Image (2 .. K'Image'Last);
+  end To_String;
+
+  procedure Print_Prime_Partitions (K : Integer) is
+    Partitions : Partition_List.Vector := Get_Prime_Partitions(K);
+  begin
+    for Partition of Partitions loop
+      Put(To_String(K) & " = ");
+
+      for P of Partition loop
+        Put (To_String(P));
+
+        if P /= Partition.Last_Element then
+          Put (" + ");
+        end if;
+      end loop;
+
+      Put_Line (" (" & To_String(Natural(Partition.Length)) & ")");
+    end loop;
+
+    Put_Line (To_String(K) & " has " & To_String(Natural(Partitions.Length)) & " prime partitions");
+  end Print_Prime_Partitions;
+begin
+  Print_Prime_Partitions(42);
+end Prime_Partitions;
+~~~~
+
+![A screenshot showing Ada running the Prime Partitions program.](ada/screenshot.png width="600px")
+
+<!-- Details, source code, and screenshots here -->
+<!-- Include screenshot showing prime partitions of 42 -->
+
+
+Language: Haskell  <!-- include only the language that you chose, delete others -->
+--------------------------------
+
+~~~~
+import Data.List
+
+-- Checks if n has divisors in 2..k
+hasDivisors :: Integer -> Integer -> Bool
+hasDivisors n k
+  | k > 1   = mod n k == 0 || hasDivisors n (k - 1)
+  | k <= 1  = False
+
+-- Checks if n is a prime number
+isPrime :: Integer -> Bool
+isPrime n
+  | n > 1   = not (hasDivisors n (n - 1))
+  | n < 0   = isPrime (-n)
+  | n == 1  = False
+  | n == 0  = False
+
+-- Get all primes in between m and n
+getPrimes :: Integer -> Integer -> [Integer]
+getPrimes m n
+  | n < m                 = []
+  | n >= m  && isPrime m  = m : getPrimes (m + 1) n
+  | otherwise             = getPrimes (m + 1) n
+
+-- Append a number to every partition
+appendToPartitions :: Integer -> [[Integer]] -> [[Integer]]
+appendToPartitions p = map (p :)
+
+{-
+DISCLAIMER:
+I originally wrote appendToPartitions using pattern matching, as follows
+
+appendToPartitions p [] = []
+appendToPartitions p (y : ys) = (p : y) : appendToPartitions p ys
+
+and the linter suggested rewriting it using the map function and using the eta
+reduction from p ys = map (p :) ys.
+-}
+
+-- Get prime partitions that contain a given value p
+getPrimePartitionsAux :: Integer -> Integer -> Integer -> [[Integer]]
+getPrimePartitionsAux n lb p
+  | p == n = [[p]]
+  | p /= n = appendToPartitions p (getPrimePartitions (n - p) (p + 1))
+
+-- Get prime partitions
+getPrimePartitions :: Integer -> Integer -> [[Integer]]
+getPrimePartitions n lb
+  | n < 2 || null primes =  []
+  | n >= 2 && not (null primes) = getPrimePartitionsAux n lb (head primes) ++ getPrimePartitions n (head primes + 1)
+    where
+      primes = getPrimes lb n
+
+printPartitions :: Integer -> [[Integer]] -> IO ()
+printPartitions n [] = do return ()
+printPartitions n (y : ys) = do
+  putStrLn (show n ++ " = " ++ sum ++ " (" ++ show (length y) ++ ")")
+  printPartitions n ys
+  where
+    sum = intercalate " + " (map show y)
+
+main :: IO ()
+main = do
+  printPartitions n partitions
+  putStrLn (show n ++ " has " ++ show (length partitions) ++ " prime partitions")
+  where
+    n = 42
+    partitions = getPrimePartitions n 2
+~~~~
+
+![A screenshot showing Haskell running the Prime Partitions program.](haskell/screenshot.png width="600px")
+
+Language: C#
+--------------------------------
+
+~~~~
+using System;
+
+class Program {
+  static bool IsPrime(int n) {
+    if (n < 2) {
+      return false;
+    }
+
+    for (int i = 2; i * i <= n; i++) {
+      if (n % i == 0) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  static List<int> GetPrimes(int lowerBound, int upperBound) {
+    List<int> primes = new List<int>();
+
+    for (int i = lowerBound; i <= upperBound; i++) {
+      if (IsPrime(i)) {
+        primes.Add(i);
+      }
+    }
+
+    return primes;
+  }
+
+  static List<List<int>> GetPrimePartitions(int n, int bound = 2) {
+    List<List<int>> partitions = new List<List<int>>();
+    List<int> primes = GetPrimes(bound, n);
+
+    if (n < 2) {
+      return partitions;
+    }
+
+    for (int i = 0; i < primes.Count; i++) {
+      int p = primes[i];
+
+      if (n == p) {
+        partitions.Add(new List<int> { p });
+      } else {
+        List<List<int>> subPartitions = GetPrimePartitions(n - p, p + 1);
+
+        if (subPartitions.Count > 0) {
+          for (int j = 0; j < subPartitions.Count; j++) {
+            List<int> partition = subPartitions[j];
+            partition.Add(p);
+          }
+
+          partitions.AddRange(subPartitions);
+        }
+      }
+    }
+
+    return partitions;
+  }
+
+  static void PrintPrimePartitions(int n) {
+    List<List<int>> partitions = GetPrimePartitions(n);
+
+    for (int i = 0; i < partitions.Count; i++) {
+      List<int> partition = partitions[i];
+      Console.Write($"{n} = ");
+
+      for (int j = 0; j < partition.Count; j++) {
+        Console.Write(partition[j]);
+        Console.Write(j < partition.Count - 1 ? " + " : "");
+      }
+
+      Console.Write($" ({partition.Count})\n");
+    }
+
+    Console.WriteLine($"{n} has {partitions.Count} prime partitions\n");
+  }
+
+  static void Main(string[] args) {
+    PrintPrimePartitions(42);
+  }
+}
+~~~~
+
+![A screenshot showing C# running the Prime Partitions program.](csharp/screenshot.png width="600px")
+
+Language: Ruby
+--------------------------------
+
+I chose to do Part 4 of the assignment using Ruby because I had read somewhere that it was a beautiful language. Also, I definitively didn't wanna do in JS out of self-respect and I knew nothing about Perl.
+
+~~~~
+def is_prime(n)
+  if n < 2
+    return false
+  end
+
+  for m in 2..(n - 1)
+    if n % m == 0
+      return false
+    end
+  end
+
+  return true
+end
+
+def get_primes(lower_bound, upper_bound)
+  list = []
+
+  for p in lower_bound..upper_bound
+    if is_prime(p)
+      list.append(p)
+    end
+  end
+
+  return list
+end
+
+def get_prime_partitions(n, bound = 2)
+  partitions = []
+  primes = get_primes(bound, n)
+
+  if n < 2
+    return []
+  end
+
+  for p in primes
+    if n == p
+      partitions += [[p]]
+    end
+
+    smaller_partitions = get_prime_partitions(n - p, p + 1)
+
+    for partition in smaller_partitions
+      partition.append(p)
+    end
+
+    partitions = partitions + smaller_partitions
+  end
+
+  return partitions
+end
+
+def print_prime_partitions(n)
+  partitions = get_prime_partitions(n)
+
+  if partitions.length == 0
+    puts "There are no prime partitions of #{n}"
+  else
+    for partition in partitions
+      puts "#{n} = #{partition.join(" + ")} (#{partition.length})"
+    end
+
+    puts "#{n} has #{partitions.length} prime partitions"
+  end
+end
+
+n = 42
+print_prime_partitions(n)
+~~~~
+
+![A screenshot showing Ruby running the Prime Partitions program.](ruby/screenshot.png width="600px")
+
+Language: Prolog
+--------------------------------
+
+TBD...
+
+<!-- Details, source code, and screenshots here -->
+<!-- Include screenshot showing prime partitions of 42 -->
+
+Language: Scheme (extra credit)
+--------------------------------
+
+~~~~
+; Checks if n has divisors in 2..k
+(define (has-divisors n k)
+  (if (= k 1)
+    #f
+    (if (= (remainder n k) 0)
+      #t
+      (has-divisors n (- k 1)))))
+
+; Checks if n is prime
+(define (is-prime n)
+  (if (= n 1)
+    #f
+    (not (has-divisors n (- n 1)))))
+
+; Returns a list of prime numbers between m and n, inclusive
+(define (get-primes m n)
+  (if (< n m)
+    '()
+    (if (is-prime m)
+      (cons m (get-primes (+ m 1) n))
+      (get-primes (+ m 1) n))))
+
+; Appends p to every partition in a list of partitions
+(define (append-to-partitions p partitions)
+  (map (lambda (partition) (cons p partition)) partitions))
+
+; Returns the prime partitions of n containing p where every element >= p
+(define (get-prime-partitions-with-p n lower-bound p)
+  (if (= p n)
+    (cons (cons p '()) '())
+    (append-to-partitions p (get-prime-partitions (- n p) (+ p 1)))))
+
+; Returns the prime partitions of n where every element >= p
+(define (get-prime-partitions n lower-bound)
+  (if (or (< n 2) (= 0 (length (get-primes lower-bound n))))
+    '()
+    (append (get-prime-partitions-with-p n lower-bound (car (get-primes lower-bound n)))
+      (get-prime-partitions n (+ 1 (car (get-primes lower-bound n)))))))
+
+; Intercalates a list of strings with a separator
+(define (intercalate s l)
+  (if (= 1 (length l))
+    (car l)
+    (string-append (car l) s (intercalate s (cdr l)))))
+
+; Converts a partition to a string
+(define (partition-to-string n partition)
+  (string-append
+    (number->string n)
+    " = "
+    (intercalate " + " (map number->string partition))
+    " ("
+    (number->string (length partition))
+    ")\n"))
+
+; Converts a list of partitions to a string
+(define (partitions-to-string n partitions)
+  (if (null? partitions)
+    ""
+    (string-append
+      (partition-to-string n (car partitions))
+      (partitions-to-string n (cdr partitions)))))
+
+(define N 20)
+
+(display (partitions-to-string N (get-prime-partitions N 2)))
+(display (string-append
+  (number->string N)
+  " has "
+  (number->string (length (get-prime-partitions N 2)))
+  " prime partitions"))
+
+; wow, this language sucks...
+~~~~
+
+![A screenshot showing Scheme running the Prime Partitions program.](scheme/screenshot.png width="600px")
+
+Assignment Reflection
+======================
+
+<!-- Note: wrapping table in div.noheader will hide the table's header -->
+<!-- Note: wrapping table in div.firstcol will style the first column different from other columns -->
+<div class="noheader firstcol">
+                        |     
+------------------------|-----
+Ada                     | Although I get that this language is a bit safer than other languages that are not as annoying about declaring everything, I don't really see why somebody would choose Ada instead of trying to formally prove the correctness of the program on a less cumbersome language.
+OCaml, Haskell          | I chose Haskell out of comfort since I had already programmed a tiny bit on it and enjoyed it. It seems like it'd be a good language to solve recursive problems.
+C#, Go, Rust            | I chose C# out of comfort since I had already programmed a tiny bit on it and enjoyed it. I think C# would shine in bigger applications, for something as simple as the prime partitions problem, there's truly no need for OOP.
+JavaScript, Perl, Ruby  | I didn't really choose Ruby: I got scared away from JS. It was my favorite language because it allows for faster coding than the alternatives in my opinion.
+Prolog                  | TBD
+Scheme (extra)          | My least favorite language by far. I think it'd be impossible to use for anything moderately complex due to all the time one would waste counting parentheses. I don't see any reason why anybody would choose to code in Scheme instead of Haskell.
+</div>
+
+
+<!--
+How do the languages compare to one another?
+Which language was your favorite?  Which was your least favorite?
+What type of problems would each language be good at solving?
+When you had a choice of language, why did you decide on the language in which you implemented your solution?
+If you worked with a partnor, how did you decide to split up the work?
+
+List any other comments below.
+Feel free to provide any feedback on how much you learned from doing the assignment, and whether you enjoyed doing it.
+-->
+
+
+
+
+
+<!--   Feel free to modify the following to fit a theme of your choosing   -->
+<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet"> <!-- a sans-serif font -->
+<style>  /* A TAYLOR-INSPIRED THEME */
+    body {font-family:'Open Sans',sans-serif;}
+    .md a:link, .md a:visited {color:hsl(252,23.0%,44.3%); font-family:'Open Sans',sans-serif;}
+    .md table.table th {background-color:hsl(252,23.0%,44.3%);}
+    .md .noheader th {display:none;}
+    .md .firstcol td:first-child {white-space:pre;color:white;vertical-align:top;font-weight:bold;border-color:black;background:hsl(252,23.0%,54.3%);}
+    .md .firstcol tr:nth-child(even) td:first-child {background:hsl(252,23.0%,44.3%);}
+</style>
+
+
+<!-- ****************************** -->
+<!--    Leave the content below     -->
+<!-- ****************************** -->
+
+<!-- The script and style below are added for clarity and to workaround a bug -->
+<script>
+    // this is a hack to workaround a bug in Markdeep+Mathjax, where
+    // `$`` is automatically converted to `\(`` and `\)`` too soon.
+    // the following code will replace the innerHTML of all elements
+    // with class "dollar" with a dollar sign.
+    setTimeout(function() {
+        var dollars = document.getElementsByClassName('dollar');
+        for(var i = 0; i < dollars.length; i++) {
+            dollars[i].innerHTML = '&#' + '36;'; // split to prevent conversion to $
+        }
+    }, 1000);
+</script>
+<style>
+    /* adding some styling to <code> tags (but not <pre><code> coding blocks!) */
+    :not(pre) > code {
+        background-color: rgba(0,0,0,0.05);
+        outline: 1px solid rgba(0,0,0,0.15);
+        margin-left: 0.25em;
+        margin-right: 0.25em;
+    }
+    /* fixes table of contents of medium-length document from looking weird if admonitions are behind */
+    .md div.mediumTOC { background: white; }
+    .md div.admonition { position: initial !important; }
+</style>
+
+<!--   Leave the following Markdeep formatting code, as this will format your text above to look nice in a wed browser   -->
+
+<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
