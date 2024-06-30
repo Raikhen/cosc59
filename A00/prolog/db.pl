@@ -2,63 +2,72 @@
 % CS59 A00 - Lang Comp - Prolog Module
 % This program defines an implementation of distinct prime partitions in Prolog
 
-% Define primes with isPrime/1
-isPrime(N) :- 
-    N < 2, 
-    false.
-  isPrime(2). % 2 is prime
-  isPrime(N) :-
-    N > 2,
-    hasFactor(N, N-1).
-  
-  % Define if a number is divisible by others
-  hasFactor(N, X) :- 
-    X > 1,
-    mod(N, X) =\= 0, % 
-    hasFactor(N, X-1). % Recurse for each X less than N
-  hasFactor(_, X) :- 1 is X. % Every num is a factor of itself
-  
-  % Generate a list of primes, L is a list to store
-  getPrimes(X, Y, L) :- getPrimes(X, Y, [], L). % Helper with new empty list
-  getPrimes(X, Y, L, Lp) :-
-    (X > Y -> % If X is greater than Y
-        Lp = L; % Set Lp to our empty List
-      Yp = Y-1, % Used to store Y and Y-1 simultaneously.
-      (isPrime(Y) -> % If Y is prime, add it to the list
-        getPrimes(X, Yp, [Y | L], Lp);
-      getPrimes(X, Yp, L, Lp))).
-  
-  % Add partitions for determining combinations
-  addPartition(P, L) :-
-    L = [H | T], % List with head and Tail
-    addPartition(Pp, T),
-    P is H + Pp. % Add new number to partition
-  addPartition(0, []). % Basecase with empty list.
-  
-  % Create distinct prime partitions
-  getPrimePartitions(N) :- 
-    getPrimes(1, N, PL), % Get a list PL (Prime List) of all primes from 1 to N
-    getPrimePartitions(N, PL, [], L), % Recursively partition the primelist
-    sort(L, SL), % sort the list into a list SL
-    printPrimePartitions(N, SL).
-  
-  % Helper for getPrimePartitions, handles algorithm to recursively generate partitions
-  getPrimePartitions(N, PL, L, Lp) :-
-    (addPartition(P, L),
-    P = N -> % If the sum created is equal to our target N, add it to our list
-    Lp = L;
-    
-    PL = [H | T], % PrimeList is Head + Tail
-    (getPrimePartitions(N, T, [H | L], Lp);
-    getPrimePartitions(N, T, L, Lp))).
-  
-  % Print function
-  printPrimePartitions(N, PL) :- 
-    PL = [H | T],
-    length(T, S), % Get length of our list, store it in variable S
-    (S = 0 -> format('~d~n', H); % If list is empty, print our number.
-    format('~d + ', H)), % Otherwise print number with plus sign
-    printPrimePartitions(T), % Print the rest.
-    length(PL, NP), % Get number of partitions
-    format('~d has ~d prime partitions', [N, NP]).
-  printPrimePartitions([]). % Basecase
+% Define primes with following rules
+isPrime(N) :-
+  N < 2,
+  !,
+  fail.
+isPrime(2) :-
+  !.
+isPrime(N) :-
+  N > 2,
+  \+ hasFactor(N, 2).
+
+% Define if a number is divisible by others
+hasFactor(N, X) :-
+  X * X =< N,
+  (N mod X =:= 0;
+   X2 is X + 1,
+   hasFactor(N, X2)).
+
+% Generate a list of primes, L is a list to store
+getPrimes(X, Y, L) :- getPrimes(X, Y, [], L). % Helper with new empty list
+getPrimes(X, Y, L, Lp) :-
+  (X > Y ->
+      Lp = L; % If X is greater than Y, set Lp to our empty List
+   Yp is Y - 1,
+   (isPrime(Y) ->
+     getPrimes(X, Yp, [Y | L], Lp); % If Y is prime, add it to the list
+     getPrimes(X, Yp, L, Lp))).
+
+% Add partitions for determining combinations
+addPartition(P, [H | T]) :-
+  addPartition(Pp, T),
+  P is H + Pp. % Add new number to partition
+addPartition(0, []). % Base case with empty list.
+
+% Find all subsets of a list to assist our partitions
+subset([], []). % Empty set has no partitions except itself
+subset([H | T], [H | Tp]) :-
+  subset(T, Tp). % Find partitions w/ head
+subset([_ | T], Tp) :-
+  subset(T, Tp). % Find partitions w/o head
+
+% Create distinct prime partitions
+getPrimePartitions(N) :-
+  getPrimes(1, N, PL), % Get a list PL (Prime List) of all primes from 1 to N
+  findall(L, (subset(PL, L), addPartition(P, L), P =:= N), Ls), % Get all possible partitions
+  sort(Ls, SL), % Sort the list
+  length(SL, NP), % Get number of partitions
+  printPrimePartitions(SL, N, NP). % Print from the sorted list
+
+% Print number of partitions
+printPrimePartitions(PL, N, NP) :-
+  format('~d has ~d prime partitions.~n', [N, NP]), % Print the number of partitions
+  printPartitions(PL). % Print all partitions
+
+% Print all our partitions in correct format
+printPartitions([]).
+printPartitions([H | T]) :-
+printPartition(H), % Print one node (the head)
+  nl,
+  printPartitions(T). % Recall for tail.
+
+% Print each partition
+printPartition([H | T]) :-
+  length(T, S), % Get current length of our tail
+  (S =:= 0 ->
+     format('~d', [H]); % If our tail is empty, just print the value
+     format('~d + ', [H])), % Else, print value with a plus sign
+  printPartition(T).
+printPartition([]). % Base case
