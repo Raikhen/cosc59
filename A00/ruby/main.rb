@@ -39,21 +39,21 @@ def get_prime_partitions(n, bound = 2)
 
     smaller_partitions = get_prime_partitions(n - p, p + 1)
 
-    if smaller_partitions.length > 0
-      for partition in smaller_partitions
-        partition.append(p)
-      end
-
-      partitions = partitions + smaller_partitions
+    for partition in smaller_partitions
+      partition.append(p)
     end
+
+    partitions = partitions + smaller_partitions
   end
 
   return partitions
 end
 
-def print_prime_partitions(n, partitions)
+def print_prime_partitions(n)
+  partitions = get_prime_partitions(n)
+
   if partitions.length == 0
-    puts "There are no partitions of #{n}"
+    puts "There are no prime partitions of #{n}"
   else
     for partition in partitions
       puts "#{n} = #{partition.join(" + ")} (#{partition.length})"
@@ -63,6 +63,5 @@ def print_prime_partitions(n, partitions)
   end
 end
 
-n = 20
-partitions = get_prime_partitions(n)
-print_prime_partitions(n, partitions)
+n = -5
+print_prime_partitions(n)

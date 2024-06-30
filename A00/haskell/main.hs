@@ -14,23 +14,20 @@ isPrime n
   | n == 1  = False
   | n == 0  = False
 
--- Get all primes in between m and n, sorted in descending order
-getPrimesDesc :: Integer -> Integer -> [Integer]
-getPrimesDesc m n
-  | n < m                     = []
-  | n >= m && isPrime n       = n : getPrimesDesc m (n - 1)
-  | n >= m && not (isPrime n) = getPrimesDesc m (n - 1)
-
--- Get all primes in between m and n, sorted in ascending order
+-- Get all primes in between m and n
 getPrimes :: Integer -> Integer -> [Integer]
-getPrimes m n = reverse (getPrimesDesc m n)
+getPrimes m n
+  | n < m                 = []
+  | n >= m  && isPrime m  = m : getPrimes (m + 1) n
+  | otherwise             = getPrimes (m + 1) n
 
 -- Append a number to every partition
 appendToPartitions :: Integer -> [[Integer]] -> [[Integer]]
 appendToPartitions p = map (p :)
 
 {-
-DISCLAIMER: I originally wrote appendToPartitions using pattern matching, as follows
+DISCLAIMER:
+I originally wrote appendToPartitions using pattern matching, as follows
 
 appendToPartitions p [] = []
 appendToPartitions p (y : ys) = (p : y) : appendToPartitions p ys
@@ -66,5 +63,5 @@ main = do
   printPartitions n partitions
   putStrLn (show n ++ " has " ++ show (length partitions) ++ " prime partitions")
   where
-    n = 20
+    n = 42
     partitions = getPrimePartitions n 2
