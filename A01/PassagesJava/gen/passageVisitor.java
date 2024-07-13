@@ -10,9 +10,51 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface passageVisitor<T> extends ParseTreeVisitor<T> {
 	/**
-	 * Visit a parse tree produced by {@link passageParser#prule}.
+	 * Visit a parse tree produced by {@link passageParser#s}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitPrule(passageParser.PruleContext ctx);
+	T visitS(passageParser.SContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link passageParser#t}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitT(passageParser.TContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link passageParser#l}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitL(passageParser.LContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link passageParser#v}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitV(passageParser.VContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link passageParser#c}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitC(passageParser.CContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link passageParser#x}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitX(passageParser.XContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link passageParser#r}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitR(passageParser.RContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link passageParser#b}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitB(passageParser.BContext ctx);
 }

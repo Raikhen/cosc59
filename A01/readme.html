@@ -1,0 +1,512 @@
+**A01 - Language Recognition**
+
+<!--
+
+General
+========
+
+For each of your team's implementations, explain the following (where appropriate and applicable):
+
+- details on calling conventions, input and output data formats, limitations, bugs, and special features.
+- negative aspects of your program (limitations, known bugs)
+- positive aspects (extensions, special features)
+- describe your choice of modularization (abstractions), data structures, and algorithms
+- explain anything you did that is likely to be different from what other students may have done
+- justify any design decisions for which the rationale isn't immediately clear
+
+Feel free to modify the structure of this `readme.html` file to fit the current assignment and to fit how you wish to present your findings.
+
+
+Submission
+-----------
+w
+Create a zip file that contains all of your code, this `readme.html` document, and any additional files of evidence (ex: screenshots).
+
+Use folders to divide up the subparts of your submission.
+For example, your zip file could look like the following:
+
+~~~~
+readme.html
+ada/
+    primepartitions.adb
+    screenshot.png
+go/
+    primepartitions.go
+    screenshot.png
+haskell/
+    primepartitions.hs
+    screenshot.png
+prolog/
+    primepartitions.pl
+    screenshot.png
+python/
+    primepartitions.py
+    screenshot.png
+~~~~
+-->
+
+
+Author
+=============
+
+<!-- Note: wrapping table in div.noheader will hide the table's header -->
+<!-- Note: wrapping table in div.firstcol will style the first column different from other columns -->
+<div class="noheader firstcol">
+                  |             
+------------------|-------------
+name              | Dylan Fridman
+computer + OS     | Macbook Air, macOS
+time to complete  | 15 hours
+additional help   | see Reflection section
+</div>
+
+
+Test Cases
+=================
+
+Here are the test cases that I used:
+
+~~~~
+1wrong
+John
+wrong wrong
+1 John 1:2-4:2 (Wrong)
+1 John 1:2-4
+Ps 12:1,3-4
+Test 2;2;2
+Rev 2:4;4:3-6 (NASB)
+Rev 2:4;4:3-6;1:2-2 (OhYeah)
+Rev 2:4;4:3-6;1-2:2 (OhNo)
+Hey 1-2-3
+9 Matthew 77:190-314 (MyOwnVersion)
+123 123 123
+:::
+John 1
+1 1
+123
+--
+-:123
+;
+C
+D
+4
+CD
+1 John (Sup)
+~~~~
+
+
+Implementations
+================
+
+Language: C
+--------------------------------
+
+I didn't realize that there was a lexer already written for us so
+I ended up deciding to not make one. Retrospectively, this was a mistake.
+Not tokenizing the input made it so that it wasn't obvious that the grammar was LL(1) so
+I ended up checking every possible breakpoint. For example, in the `S` rule, I have a
+two nested for loop checking what are the possible places to separate the string into `B`, `R`, and `T`.
+Clearly, this is not the most efficient. That said, that doesn't really matter because the input is small.
+
+~~~~
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#define M 1000000 // Maximum number of characters in reference
+
+bool letter(char* ref, int start, int end) {
+  // printf("letter(%d, %d)\n", start, end);
+  
+  if (end != start + 1) return false;
+  if (start < 0) return false;
+
+  bool isUppercase = ref[start] >= 'A' && ref[start] <= 'Z';
+  bool isLowercase = (ref[start] >= 'a' && ref[start] <= 'z');
+  return isUppercase || isLowercase;
+}
+
+bool digit(char* ref, int start, int end) {
+  // printf("digit(%d, %d)\n", start, end);
+  
+  if (end != start + 1) return false;
+  if (start < 0) return false;
+
+  return ref[start] >= '0' && ref[start] <= '9';
+}
+
+bool N(char* ref, int start, int end) {
+  // printf("N(%d, %d)\n", start, end);
+  
+  if (start < 0 || start >= end) return false;
+  
+  if (end == start + 1) {
+    return letter(ref, start, end);
+  }
+
+  return letter(ref, start, start + 1) && N(ref, start + 1, end);
+}
+
+bool D(char* ref, int start, int end) {
+  // printf("D(%d, %d)\n", start, end);
+  
+  if (start < 0 || start >= end) return false;
+  
+  if (end == start + 1) {
+    return digit(ref, start, end);
+  }
+
+  return digit(ref, start, start + 1) && D(ref, start + 1, end);
+}
+
+bool O(char* ref, int start, int end) {
+  // printf("O(%d, %d)\n", start, end);
+  
+  if (start < 0 || start > end) return false;
+
+  return end == start || (digit(ref, start, start + 1) && ref[start + 1] == ' ');
+}
+
+bool T(char* ref, int start, int end) {
+  // printf("T(%d, %d)\n", start, end);
+  
+  if (start < 0 || start > end) return false;
+  if (end == start) return true;
+
+  bool parens = ref[start + 1] == '(' && ref[end - 1] == ')';
+  return ref[start] == ' ' && parens && N(ref, start + 2, end - 1);
+}
+
+bool L(char* ref, int start, int end) {
+  // printf("L(%d, %d)\n", start, end);
+  
+  if (start < 0 || start >= end) return false;
+  if (D(ref, start, end)) return true;
+
+  for (int i = start; i < end; i++) {
+    if (ref[i] == '-' && D(ref, start, i) && D(ref, i + 1, end)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool V(char* ref, int start, int end) {
+  // printf("V(%d, %d)\n", start, end);
+  
+  if (start < 0 || start >= end) return false;
+  if (L(ref, start, end)) return true;
+
+  for (int i = start; i < end; i++) {
+    if (ref[i] == ',' && L(ref, start, i) && V(ref, i + 1, end)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool C(char* ref, int start, int end) {
+  // printf("C(%d, %d)\n", start, end);
+  
+  return D(ref, start, end);
+}
+
+bool X(char* ref, int start, int end) {
+  // printf("X(%d, %d)\n", start, end);
+  
+  if (start < 0 || start >= end) return false;
+  if (C(ref, start, end)) return true;
+
+  for (int i = start; i < end; i++) {
+    if (ref[i] == ':' && C(ref, start, i) && V(ref, i + 1, end)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool R(char* ref, int start, int end) {
+  // printf("R(%d, %d)\n", start, end);
+  
+  if (start < 0 || start > end) return false;
+  if (X(ref, start, end) || start == end) return true;
+
+  for (int i = start; i < end; i++) {
+    if (ref[i] == ';' && X(ref, start, i) && R(ref, i + 1, end)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool RS(char* ref, int start, int end) {
+  if (start < 0 || start > end) return false;
+  if (start == end) return true;
+  return ref[start] == ' ' && R(ref, start + 1, end);
+}
+
+bool B(char* ref, int start, int end) {
+  // printf("B(%d, %d)\n", start, end);
+
+  if (start < 0 || start >= end) return false;
+
+  for (int i = start; i < end; i++) {
+    if (O(ref, start, i) && N(ref, i, end)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool S(char* ref, int start, int end) {
+  // printf("S(%d, %d)\n", start, end);
+
+  if (start < 0 || start >= end) return false;
+
+  for (int i = start; i <= end; i++) {
+    for (int j = i; j <= end; j++) {
+      if (B(ref, start, i) && RS(ref, i, j) && T(ref, j, end)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+bool checkReference(char *ref, size_t n) {
+  return S(ref, 0, n);
+}
+
+void processReference(char *ref, size_t n) {
+  bool isReferenceValid = checkReference(ref, n);
+  
+  if (isReferenceValid) {
+    printf("%s\nValid\n\n", ref);
+  } else {
+    printf("%s\nInvalid\n\n", ref);
+  }
+}
+
+int main(void) {
+  FILE *file = fopen("../test.txt", "r");
+
+  char *ref;
+  size_t n = 0;
+  int c;
+
+  if (file == NULL) {
+    printf("Could not open file\n");
+    return 1; // Could not open file
+  }
+
+  ref = malloc(M);
+
+  while ((c = fgetc(file)) != EOF) {
+    if (c == '\n') {
+      processReference(ref, n);
+
+      // Clear reference
+      for (int i = 0; i < n; i++) ref[i] = '\0';
+      n = 0;
+    } else {
+      ref[n++] = (char) c;
+    }
+  }
+
+  processReference(ref, n);
+  return 0;
+}
+~~~~
+
+![The C program.](screenshots/c.png width="600px")
+
+<!-- Details, source code, and screenshots here -->
+<!-- Include screenshot showing prime partitions of 42 -->
+
+Language: Perl
+--------------------------------
+
+I chose to stay loyal to the original production rules to keep it simple instead of making one big regular expression.
+
+~~~~
+use 5.010;
+
+sub check {
+  $N = qr/[a-zA-Z]+/;
+  $D = qr/[0-9]+/;
+  $T = qr/( \($N\)){0, 1}/;
+  $L = qr/$D|$D-$D/;
+  $V = qr/$L(,$L)*/;
+  $C = qr/$D/;
+  $X = qr/$C|($C:$V)/;
+  $R = qr/( $X((;$X))*)?/;
+  $B = qr/($D ){0, 1}$N/;
+  $S = qr/$B$R$T/;
+
+  return $_[0] =~ /^$S$/;
+}
+
+open(FH, "../test.txt") or die "There was an error opening the file.";
+
+while (<FH>) {
+  print $_;
+
+  if (!((substr $_, -1) =~ /\n/)) {
+    say "";
+  }
+
+  if (check($_)) {
+    print "Valid\n\n";
+  } else {
+    print "Invalid\n\n";
+  }
+}
+
+close;
+~~~~
+
+![The Perl program.](screenshots/perl.png width="600px")
+
+Language: Java with ANTLR4
+--------------------------------
+
+~~~~
+import org.antlr.v4.runtime.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+public class LineByLine {
+    public static void main(String[] args) throws Exception {
+        BufferedReader reader = new BufferedReader(new FileReader("inputs/test.txt"));
+        String line = reader.readLine();
+
+        while (line != null) {
+            System.out.println(line);
+            CharStream input = CharStreams.fromString(line);
+            PassageLexer lexer = new PassageLexer(input);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            PassageParser parser = new PassageParser(tokens);
+            parser.s();
+
+            // Check if there was an error
+            int k = parser.getNumberOfSyntaxErrors();
+
+            if (k > 0) {
+                System.out.println("Invalid\n");
+            } else {
+                System.out.println("Valid\n");
+            }
+
+            // Get next line
+            line = reader.readLine();
+        }
+    }
+}
+~~~~
+
+~~~~
+grammar Passage;
+
+s       : b r t EOF;
+
+t       : (' (' NAME ')')?;
+
+l       : n
+        | n '-' n
+        ;
+
+v       : l (',' l)*;
+
+c       : n;
+
+x       : c
+        | (c ':' v);
+
+r       : (' ' x (';' x)*)?;
+
+b       : (DIGIT ' ')? NAME;
+
+n       : DIGIT+;
+
+DIGIT   : [0-9] ;
+NAME    : [a-zA-Z]+ ;
+NEWLINE : '\r'? '\n' ;
+WS      : [ \t]+ -> skip ;
+~~~~
+
+![The Java with ANTLR4 program.](screenshots/java.png width="600px")
+
+Assignment Reflection
+======================
+
+<!-- Note: wrapping table in div.noheader will hide the table's header -->
+<!-- Note: wrapping table in div.firstcol will style the first column different from other columns -->
+<div class="noheader firstcol">
+                        |     
+------------------------|-----
+C                       | This was one of my first times coding in plain C (in contrast to C++). It was quite annoying. I think it's probably the kind of language that you need time to familiarize yourself with in order to be time efficient.
+Perl                    | I didn't like Perl's syntax (perhaps simply because it reminded me of PHP) but using regular expressions was so nice, it allowed me to write the program in just a few lines.
+Java with ANTLR4        | I liked ANTLR4 but I'm not the biggest fan of Java and all the boilerplate it entails. I spend the vast majority of my time trying solve a bug that at the end of the day was a issue with refactoring after renaming the project.
+</div>
+
+<!--
+How do the languages compare to one another?
+Which language was your favorite?  Which was your least favorite?
+What type of problems would each language be good at solving?
+When you had a choice of language, why did you decide on the language in which you implemented your solution?
+If you worked with a partnor, how did you decide to split up the work?
+
+List any other comments below.
+Feel free to provide any feedback on how much you learned from doing the assignment, and whether you enjoyed doing it.
+-->
+
+<!--   Feel free to modify the following to fit a theme of your choosing   -->
+<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet"> <!-- a sans-serif font -->
+<style>  /* A TAYLOR-INSPIRED THEME */
+    body {font-family:'Open Sans',sans-serif;}
+    .md a:link, .md a:visited {color:hsl(252,23.0%,44.3%); font-family:'Open Sans',sans-serif;}
+    .md table.table th {background-color:hsl(252,23.0%,44.3%);}
+    .md .noheader th {display:none;}
+    .md .firstcol td:first-child {white-space:pre;color:white;vertical-align:top;font-weight:bold;border-color:black;background:hsl(252,23.0%,54.3%);}
+    .md .firstcol tr:nth-child(even) td:first-child {background:hsl(252,23.0%,44.3%);}
+</style>
+
+
+<!-- ****************************** -->
+<!--    Leave the content below     -->
+<!-- ****************************** -->
+
+<!-- The script and style below are added for clarity and to workaround a bug -->
+<script>
+    // this is a hack to workaround a bug in Markdeep+Mathjax, where
+    // `$`` is automatically converted to `\(`` and `\)`` too soon.
+    // the following code will replace the innerHTML of all elements
+    // with class "dollar" with a dollar sign.
+    setTimeout(function() {
+        var dollars = document.getElementsByClassName('dollar');
+        for(var i = 0; i < dollars.length; i++) {
+            dollars[i].innerHTML = '&#' + '36;'; // split to prevent conversion to $
+        }
+    }, 1000);
+</script>
+<style>
+    /* adding some styling to <code> tags (but not <pre><code> coding blocks!) */
+    :not(pre) > code {
+        background-color: rgba(0,0,0,0.05);
+        outline: 1px solid rgba(0,0,0,0.15);
+        margin-left: 0.25em;
+        margin-right: 0.25em;
+    }
+    /* fixes table of contents of medium-length document from looking weird if admonitions are behind */
+    .md div.mediumTOC { background: white; }
+    .md div.admonition { position: initial !important; }
+</style>
+
+<!--   Leave the following Markdeep formatting code, as this will format your text above to look nice in a wed browser   -->
+
+<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>

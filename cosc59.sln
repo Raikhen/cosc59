@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "A00", "A00", "{CAFE9B24-CE2F-4FAE-8201-277FFBDC0759}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "A00", "A00", "{50F1C139-5FF4-4DCF-8BE3-68278D413A53}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "c#", "A00\csharp\c#.csproj", "{D166FB5A-2085-448E-97EE-A74F9822F8D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "c#", "A00\csharp\c#.csproj", "{FFDC65CB-03D4-4B19-B88E-7B710481E000}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,18 +13,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D166FB5A-2085-448E-97EE-A74F9822F8D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D166FB5A-2085-448E-97EE-A74F9822F8D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D166FB5A-2085-448E-97EE-A74F9822F8D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D166FB5A-2085-448E-97EE-A74F9822F8D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFDC65CB-03D4-4B19-B88E-7B710481E000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFDC65CB-03D4-4B19-B88E-7B710481E000}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFDC65CB-03D4-4B19-B88E-7B710481E000}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFDC65CB-03D4-4B19-B88E-7B710481E000}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{D166FB5A-2085-448E-97EE-A74F9822F8D7} = {CAFE9B24-CE2F-4FAE-8201-277FFBDC0759}
+		{FFDC65CB-03D4-4B19-B88E-7B710481E000} = {50F1C139-5FF4-4DCF-8BE3-68278D413A53}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A3314A70-534A-4FC0-B93E-B7523170B6B3}
+		SolutionGuid = {B1784227-5533-4A6F-8702-0417D871AFB2}
 	EndGlobalSection
 EndGlobal
