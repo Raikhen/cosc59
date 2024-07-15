@@ -8,11 +8,10 @@ Author
 <div class="noheader firstcol">
                   |             
 ------------------|-------------
-name              | Bob the Tomato
-computer + OS     | my Linux laptop
+name              | Dylan Fridman
+computer + OS     | MacBook Air, macOS Sonoma
 time to complete  | 3 hours
-partner           | Larry the Cucumber
-additional help   | see Reflection section
+partner           | Sebastian Frazier
 </div>
 
 
@@ -29,6 +28,23 @@ or improve their climbing systems knowledge in an interactive way.
 Problem
 ================
 
+<!--
+The problem that we want to solve is to write a language that can take
+a series of actions in a climbing scenario and output the resulting state.
+
+The problem of our project focuses on creating a language that can parse a climbing scenario given a description of events in the form of 
+'objects' and 'actions' and output a described result state of the scenario. Our aim is to generate singular descrpitions of end-states
+for climbing scenarios after parsing the input.
+-->
+
+The problem of our project focuses on creating a language that can parse a climbing scenario given a
+description of a starting scenario and the series actions/events that took place. This would allow us to
+
+1. Find solutions to technical climbing problems.
+2. Generate diagrams of climbing systems that could be used for educational purposes.
+3. Verify that a given solution for a problem makes sense which could also be used for educational purposes.
+
+<!--
 The problem of our project will deal with the creation of a program that can parse a climbing 'scenario' and output a 'solution' in the form of
 an order set of actions that effectively deal with the scenario. Our aim is to generate singular solutions given generated scenarios which we
 will write and determine if a user free-response input matches the computed solution or not. 
@@ -38,8 +54,10 @@ For reference: A 'sport' climbing route is a route with permanent bolted anchors
 
 Our scenario may resemble the following: if a climber is at the top of a sport climbing route and desires to clean the route by rapelling with a 
 standard rapel kit, how should they go about this action?
+-->
 
-Our solution would then be:
+A verbose version of a possible input, representing the series of actions somebody can take to clean a route on rappel,  could look like the following
+
 1. Clip into the anchor with a PAS
 2. Add a backup
 3. Hitch the 'sharp' end of the rope to something to prevent it from falling
@@ -48,18 +66,22 @@ Our solution would then be:
 6. Tie knots in both ends of the rope
 7. Throw both ends of the rope down
 8. Check for snags
-9. Attach a 'friction hitch' to the rope
-10. Attach the hitch to the climber via a locking carabiner
-11. Pull up slack from the rope
+9. Pull up slack from the rope
 10. Attach an extended ATC device to the rope.
-11. Pull in slack such until the climber weights the system
-12. Detach PAS and backup
-13. Slowly and carefully lower oneself down
-14. Pause at each 'quickdraw' and detach it from the wall
-15. After reaching the ground, detach oneself from the rope by undoing the earlier systems
-16. Untie the knots in both ends of the rope
-17. Pull the rope down from one side until it falls.
-18. Complete!
+11. Attach a 'friction hitch' to the rope
+12. Attach the hitch to the climber via a locking carabiner
+13. Pull in slack such until the climber weights the system
+14. Detach PAS and backup
+15. Slowly and carefully lower oneself down
+16. Pause at each 'quickdraw' and detach it from the wall
+17. After reaching the ground, detach oneself from the rope by undoing the earlier systems
+18. Untie the knots in both ends of the rope
+19. Pull the rope down from one side until it falls.
+
+Then, the program would output the final state of the scenario,
+which would be the climber at the bottom of the route with the rope on the ground but
+showing a list of tips/things to improve which would include attaching the friction hitch
+used for the third hand before clipping the ATC.
 
 Problem: cleaning a route on rappel
 --------------------------------
@@ -104,7 +126,7 @@ def problem:
 problem
 ~~~~
 
-Output:
+Output (verbose):
 
 The climber "basty" is at the top of "Lulu", "cloved" into a "quad" anchor.
 
