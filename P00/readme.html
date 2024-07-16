@@ -11,9 +11,8 @@ Author
 name              | Dylan Fridman
 computer + OS     | MacBook Air, macOS Sonoma
 time to complete  | 3 hours
-partner           | Sebastian Frazier
+partner           | Sebastian Frazier, Javier Rodillas, Walker Ball
 </div>
-
 
 Domain
 =================
@@ -83,6 +82,8 @@ which would be the climber at the bottom of the route with the rope on the groun
 showing a list of tips/things to improve which would include attaching the friction hitch
 used for the third hand before clipping the ATC.
 
+Also, when the input to the program requests it, the program would output a diagram of the final state or a digram per action taken.
+
 Problem: cleaning a route on rappel
 --------------------------------
 
@@ -126,10 +127,25 @@ def problem:
 problem
 ~~~~
 
-Output (verbose):
+**Input**
 
-The climber "basty" is at the top of "Lulu", "cloved" into a "quad" anchor.
+`verbose`
 
+**Output**
+
+`The climber "basty" is at the top of "Lulu", "cloved" into a "quad" anchor.`
+
+Functionality
+================
+
+First of all, the type of output depends on the input type.
+The input type can be either `verbose`, `code`, or `diagram`.
+If it's verbose, the output is a human-readable explanation of
+the resulting scenario. If it's code, the output is more easily
+read by a computer than by a human. If it's diagram, the output is
+a diagram that depicts the final scenario.
+The output will be determined by processing each "primitive" action one by one.
+By primitive action we mean actions that are not composed of other actions.
 
 <!--   Feel free to modify the following to fit a theme of your choosing   -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet"> <!-- a sans-serif font -->
