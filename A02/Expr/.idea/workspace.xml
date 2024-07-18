@@ -5,9 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4fb7ca58-9769-4091-bbc5-8b762fb8fdc1" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inputs/test.txt" beforeDir="false" afterPath="$PROJECT_DIR$/inputs/test.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Expr/EntireFile.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Expr/ErrorHandler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/EntireFile.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ErrorHandler.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../ExprListeners/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ExprListeners/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../P00/readme.html" beforeDir="false" afterPath="$PROJECT_DIR$/../../P00/readme.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ExprListeners/inputs/test.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../ExprListeners/inputs/test.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ExprListeners/out/production/Expr/Listener.class" beforeDir="false" afterPath="$PROJECT_DIR$/../ExprListeners/out/production/Expr/Listener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ExprListeners/src/Listener.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ExprListeners/src/Listener.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,6 +113,8 @@
       <workItem from="1720913052562" duration="5866000" />
       <workItem from="1720959607087" duration="271000" />
       <workItem from="1720960441775" duration="2852000" />
+      <workItem from="1721232758733" duration="659000" />
+      <workItem from="1721268915313" duration="1498000" />
     </task>
     <servers />
   </component>

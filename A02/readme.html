@@ -1,0 +1,499 @@
+**A02 - Language Translation**
+
+<!--
+
+General
+========
+
+For each of your team's implementations, explain the following (where appropriate and applicable):
+
+- details on calling conventions, input and output data formats, limitations, bugs, and special features.
+- negative aspects of your program (limitations, known bugs)
+- positive aspects (extensions, special features)
+- describe your choice of modularization (abstractions), data structures, and algorithms
+- explain anything you did that is likely to be different from what other students may have done
+- justify any design decisions for which the rationale isn't immediately clear
+
+Feel free to modify the structure of this `readme.html` file to fit the current assignment and to fit how you wish to present your findings.
+
+
+Submission
+-----------
+
+
+Create a zip file that contains all of your code, this `readme.html` document, and any additional files of evidence (ex: screenshots).
+
+Use folders to divide up the subparts of your submission.
+For example, your zip file could look like the following:
+
+~~~~
+readme.html
+ada/
+    primepartitions.adb
+    screenshot.png
+go/
+    primepartitions.go
+    screenshot.png
+haskell/
+    primepartitions.hs
+    screenshot.png
+prolog/
+    primepartitions.pl
+    screenshot.png
+python/
+    primepartitions.py
+    screenshot.png
+~~~~
+-->
+
+
+Author
+=============
+
+<div class="noheader firstcol">
+                  |             
+------------------|-------------
+name              | Dylan Fridman
+computer + OS     | MacBook Air, MacOS Sonoma
+time to complete  | 10 hours
+</div>
+
+Test Cases
+================
+
+~~~~
+2 + 43 * AB;
+4 + f;
+8 * 5 + ty6 / (7 MOD 3);
+12 * 12 * 12 + 12;
+(1 + 2) * (3 + 4);
+1 / 2 / 3;
+1 * 2 / 3 MOD 4;
+mod MOD mod;
+asd123;
+(( asd ));
+       2  +3      ;
++ - *;
+123asd;
+asd 123;
+(as;
+1 + MOD;
+~~~~
+
+Implementations
+================
+
+Since the assignment instructions didn't clarify whether the symbol table
+should contain identifiers that only appear in invalid expressions,
+I decided to include them in some of the implementations and exclude
+them in others. I exclude them in the ANTLR with Actions version and
+include them in the others.
+
+Recursive Descent Parser
+--------------------------------
+
+~~~~
+import re
+
+# File
+f = open('A02/RDP/test.txt', 'r')
+
+# Symbol table
+sym_table = set()
+
+def tokenize(input):
+  # Remove all whitespace from input
+  chunks = re.sub(r'\s', ' ', input).split()
+
+  # Define the pattern for the tokens
+  pattern = r'\+|\-|\*|/|\(|\)|MOD|[a-zA-Z][a-zA-Z0-9]*|\d+|\;'
+
+  # Initialize the list of tokens
+  tokens = []
+
+  for chunk in chunks:
+    while len(chunk) > 0:
+      # Find first match
+      match = re.search(pattern, chunk)
+
+      # Add first match to list of tokens and remove from input
+      if match != None:
+        tokens.append(match.group())
+      chunk = chunk[len(match.group()):]
+
+  return tokens
+
+def parse(tokens):
+  to_print = ''
+
+  # Terminals
+  id = lambda token: re.match(r'[a-zA-Z][a-zA-Z0-9]*', token) and token != 'MOD'
+  num = lambda token: re.match(r'\d+', token)
+
+  # Non-terminals
+  def factor():
+    nonlocal to_print
+
+    if len(tokens) == 0:
+      raise Exception('Syntax error: Expected factor but got no tokens')
+    elif tokens[0] == '(':
+      tokens.pop(0)
+      expr()
+
+      if tokens[0] != ')':
+        raise Exception('Syntax Error: Expected ")"')
+      
+      tokens.pop(0)
+    elif id(tokens[0]):
+      to_print += tokens[0] + ' '
+      sym_table.add(tokens.pop(0))
+    elif num(tokens[0]):
+      to_print += tokens[0] + ' '
+      tokens.pop(0)
+    else:
+      raise Exception(f'Syntax Error: Expected factor but got {tokens[0]}')
+
+  def factors():
+    nonlocal to_print
+
+    if len(tokens) == 0:
+      return
+    elif tokens[0] == '*':
+      tokens.pop(0)
+      factor()
+      to_print += '* '
+      factors()
+    elif tokens[0] == '/':
+      tokens.pop(0)
+      factor()
+      to_print += '/ '
+      factors()
+    elif tokens[0] == 'MOD':
+      tokens.pop(0)
+      factor()
+      to_print += 'MOD '
+      factors()
+
+  def term():
+    factor()
+    factors()
+
+  def terms():
+    nonlocal to_print
+
+    if len(tokens) == 0:
+      return
+    elif tokens[0] == '+':
+      tokens.pop(0)
+      term()
+      to_print += '+ '
+      terms()
+    elif tokens[0] == '-':
+      tokens.pop(0)
+      term()
+      to_print += '- '
+      terms()
+
+  def expr():
+    term()
+    terms()
+
+  # Parse the expression
+  expr()
+  
+  if (len(tokens) != 1 or tokens[0] != ';'):
+    raise Exception(f'Syntax Error: Expected ";" but got {tokens[0]}')
+
+  print(f'{to_print[:-1]};')
+
+# Parse every line in the file
+for x in f:
+  tokens = tokenize(x)
+
+  try:
+    parse(tokens)
+  except Exception as e:
+    print(f'Invalid input: {x.strip()[:-1]};')
+
+# Print the symbol table
+print(f'Symbol table: {', '.join(sym_table)}.')
+~~~~
+
+![A screenshot showing the RDP version of the program.](screenshots/rdp.png width="600px")
+
+ANTLR with Actions
+--------------------------------
+
+**Grammar**
+
+~~~~
+grammar Expr;
+
+@header {
+    import java.util.HashSet;
+}
+
+@members {
+    public HashSet<String> ids = new HashSet<String>();
+    public String toPrint = "";
+}
+
+start   : list EOF {
+    String s = ids.toString();
+    s = s.substring(1, s.length() - 1);
+    toPrint += "Symbol Table: " + s + ".";
+};
+
+list    : expr ';' { toPrint += ";"; } list
+        |
+        ;
+
+line    : expr ';' { toPrint += ";"; } EOF;
+
+expr    : term terms;
+
+terms   : '+' term { toPrint += "+ "; } terms
+        | '-' term { toPrint += "- "; } terms
+        |
+        ;
+
+term    : factor factors;
+
+factors : '*' factor { toPrint += "* "; } factors
+        | '/' factor { toPrint += "/ "; } factors
+        | MOD factor { toPrint += "MOD "; } factors
+        |
+        ;
+
+factor  : '(' expr ')'
+        | id = ID { toPrint += $id.text + " "; ids.add($id.text); }
+        | num = NUM { toPrint += $num.text + " "; }
+        ;
+
+MOD : 'MOD';
+NUM : [0-9]+;
+ID  : [a-zA-Z] ([a-zA-Z] | [0-9])*;
+
+// Ignore all whitespace
+WS  : (' ' | '\t' | '\n' | '\r') -> skip;
+~~~~
+
+**Java**
+
+~~~~
+import org.antlr.v4.runtime.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.HashSet;
+
+public class LineByLine {
+    public static void main(String[] args) throws Exception {
+        HashSet<String> ids = new HashSet<>();
+        BufferedReader reader = new BufferedReader(new FileReader("inputs/test.txt"));
+        String line = reader.readLine();
+
+        while (line != null) {
+            CharStream input = CharStreams.fromString(line);
+            ExprLexer lexer = new ExprLexer(input);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            ExprParser parser = new ExprParser(tokens);
+            parser.line();
+
+            if (parser.getNumberOfSyntaxErrors() == 0) {
+                System.out.println(parser.toPrint);
+                ids.addAll(parser.ids);
+            } else {
+                System.out.println("Invalid input: " + line);
+            }
+
+            line = reader.readLine();
+        }
+
+        String idsText = ids.toString();
+        idsText = idsText.substring(1, idsText.length() - 1);
+        System.out.println("Symbol Table: " + idsText + ".");
+    }
+}
+~~~~
+
+![A screenshot showing the ANTLR with Actions version of the program.](screenshots/actions.png width="600px")
+
+ANTLR with Listeners
+--------------------------------
+
+**Grammar**
+
+~~~~
+grammar Expr;
+
+line    : expr ';' EOF;
+
+expr    : term terms;
+
+terms   : '+' term terms
+        | '-' term terms
+        |
+        ;
+
+term    : factor factors;
+
+factors : '*' factor factors
+        | '/' factor factors
+        | MOD factor factors
+        |
+        ;
+
+factor  : '(' expr ')'
+        | ID
+        | NUM
+        ;
+
+MOD : 'MOD';
+NUM : [0-9]+;
+ID  : [a-zA-Z] ([a-zA-Z] | [0-9])*;
+
+// Ignore all whitespace
+WS  : (' ' | '\t' | '\n' | '\r') -> skip;
+~~~~
+
+**Java**
+
+~~~~
+import org.antlr.v4.runtime.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.HashSet;
+
+public class Listener extends ExprBaseListener {
+    private static String toPrint = "";
+    private static HashSet<String> ids = new HashSet<>();
+
+    @Override
+    public void exitTerm(ExprParser.TermContext ctx) {
+        String s = ctx.parent.getChild(0).getText();
+        int index = ctx.parent.getRuleIndex();
+
+        if (index == 2) {
+            toPrint += s + " ";
+        }
+    }
+
+    @Override
+    public void exitFactor(ExprParser.FactorContext ctx) {
+        if (ctx.ID() != null) {
+            String id = ctx.ID().getText();
+            toPrint += id + " ";
+            ids.add(id);
+        } else if (ctx.NUM() != null) {
+            toPrint += ctx.NUM().getText() + " ";
+        }
+
+        String s = ctx.parent.getChild(0).getText();
+        int index = ctx.parent.getRuleIndex();
+
+        if (index == 4) {
+            toPrint += s + " ";
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        // HashSet<String> ids = new HashSet<>();
+        BufferedReader reader = new BufferedReader(new FileReader("inputs/test.txt"));
+        String line = reader.readLine();
+
+        while (line != null) {
+            CharStream input = CharStreams.fromString(line);
+            ExprLexer lexer = new ExprLexer(input);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            ExprParser parser = new ExprParser(tokens);
+            Listener listener = new Listener();
+            parser.addParseListener(listener);
+            toPrint = "";
+            parser.line();
+
+            if (parser.getNumberOfSyntaxErrors() == 0) {
+                System.out.println(toPrint + ";");
+            } else {
+                System.out.println("Invalid input: " + line);
+            }
+
+            line = reader.readLine();
+        }
+
+        String idsText = ids.toString();
+        idsText = idsText.substring(1, idsText.length() - 1);
+        System.out.println("Symbol Table: " + idsText + ".");
+    }
+}
+~~~~
+
+![A screenshot showing the ANTLR with Listeners version of the program.](screenshots/listeners.png width="600px")
+
+Assignment Reflection
+======================
+
+Both the RDP and the ANTLR with Actions version were quite easy to implement
+and I'm happy with how they resulted. I can't say the same of the ANTLR with
+Listeners version. Although it wasn't particularly hard to implement, the
+solution doesn't seem very elegant to me. It wasn't obvious to me how to
+emit a symbol exactly when I wanted it to be emitted. The solution ends up
+doing some tree exploration which I don't love, as you can tell from lines like
+`String s = ctx.parent.getChild(0).getText();`. I'd be curious to know if there
+are more elegant solutions.
+
+<!--
+How do the languages compare to one another?
+Which language was your favorite?  Which was your least favorite?
+What type of problems would each language be good at solving?
+When you had a choice of language, why did you decide on the language in which you implemented your solution?
+If you worked with a partnor, how did you decide to split up the work?
+
+List any other comments below.
+Feel free to provide any feedback on how much you learned from doing the assignment, and whether you enjoyed doing it.
+-->
+
+<!--   Feel free to modify the following to fit a theme of your choosing   -->
+<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet"> <!-- a sans-serif font -->
+<style>  /* A TAYLOR-INSPIRED THEME */
+    body {font-family:'Open Sans',sans-serif;}
+    .md a:link, .md a:visited {color:hsl(252,23.0%,44.3%); font-family:'Open Sans',sans-serif;}
+    .md table.table th {background-color:hsl(252,23.0%,44.3%);}
+    .md .noheader th {display:none;}
+    .md .firstcol td:first-child {white-space:pre;color:white;vertical-align:top;font-weight:bold;border-color:black;background:hsl(252,23.0%,54.3%);}
+    .md .firstcol tr:nth-child(even) td:first-child {background:hsl(252,23.0%,44.3%);}
+</style>
+
+
+<!-- ****************************** -->
+<!--    Leave the content below     -->
+<!-- ****************************** -->
+
+<!-- The script and style below are added for clarity and to workaround a bug -->
+<script>
+    // this is a hack to workaround a bug in Markdeep+Mathjax, where
+    // `$`` is automatically converted to `\(`` and `\)`` too soon.
+    // the following code will replace the innerHTML of all elements
+    // with class "dollar" with a dollar sign.
+    setTimeout(function() {
+        var dollars = document.getElementsByClassName('dollar');
+        for(var i = 0; i < dollars.length; i++) {
+            dollars[i].innerHTML = '&#' + '36;'; // split to prevent conversion to $
+        }
+    }, 1000);
+</script>
+<style>
+    /* adding some styling to <code> tags (but not <pre><code> coding blocks!) */
+    :not(pre) > code {
+        background-color: rgba(0,0,0,0.05);
+        outline: 1px solid rgba(0,0,0,0.15);
+        margin-left: 0.25em;
+        margin-right: 0.25em;
+    }
+    /* fixes table of contents of medium-length document from looking weird if admonitions are behind */
+    .md div.mediumTOC { background: white; }
+    .md div.admonition { position: initial !important; }
+</style>
+
+<!--   Leave the following Markdeep formatting code, as this will format your text above to look nice in a wed browser   -->
+
+<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>

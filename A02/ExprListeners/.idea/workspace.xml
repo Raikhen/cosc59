@@ -5,9 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4fb7ca58-9769-4091-bbc5-8b762fb8fdc1" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Expr/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Expr/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Expr/inputs/test.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Expr/inputs/test.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Expr/out/production/Expr/EntireFile.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Expr/out/production/Expr/ErrorHandler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Expr/src/EntireFile.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Expr/src/ErrorHandler.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../P00/readme.html" beforeDir="false" afterPath="$PROJECT_DIR$/../../P00/readme.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inputs/test.txt" beforeDir="false" afterPath="$PROJECT_DIR$/inputs/test.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Expr/Listener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Expr/Listener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Listener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Listener.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,29 +42,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.EntireFile.executor": "Run",
-    "Application.LineByLine.executor": "Run",
-    "Application.Listener.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/dylanfridman/cosc59/A02/ExprListeners",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.EntireFile.executor&quot;: &quot;Run&quot;,
+    &quot;Application.LineByLine.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Listener.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/dylanfridman/cosc59/A02/ExprListeners&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Listener">
     <configuration name="EntireFile" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="EntireFile" />
       <module name="Expr" />
@@ -77,11 +86,24 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Listener" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Listener" />
+      <module name="Expr" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="Application.EntireFile" />
       <item itemvalue="Application.LineByLine" />
       <item itemvalue="Application.ErrorHandler" />
+      <item itemvalue="Application.Listener" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Listener" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -105,10 +127,22 @@
       <workItem from="1720913052562" duration="5866000" />
       <workItem from="1720959607087" duration="106000" />
       <workItem from="1720960276929" duration="20897000" />
+      <workItem from="1721231073294" duration="2338000" />
+      <workItem from="1721268917689" duration="1472000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.NullPointerException" package="java.lang" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
