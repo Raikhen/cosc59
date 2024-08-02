@@ -1,0 +1,248 @@
+**A10 - Object Oriented Programming**
+
+
+Author
+=============
+
+<div class="noheader firstcol">
+                  |             
+------------------|-------------
+name              | Dylan Fridman
+computer + OS     | MacBook Air, MacOS Sonoma
+time to complete  | 5 hours
+</div>
+
+Methods
+================
+
+sum
+--------------------------------
+
+~~~~
+sum: polynomial
+	| maxLength res |
+	
+	res := OrderedCollection new.
+	maxLength := (self asArray size) max: (polynomial asArray size).
+	
+	1 to: maxLength do: [ :i |
+		res addLast:
+			(((i <= polynomial asArray size) ifTrue: [ polynomial asArray at: i. ] ifFalse: [ 0.]) +
+			((i <= self asArray size) ifTrue: [ self asArray at: i. ] ifFalse: [ 0.]))
+	].
+
+	^ self class new initialize: (res asArray).
+~~~~
+
+![A screenshot showing the sum method.](screenshots/sum.png width="600px")
+
+evaluate:
+--------------------------------
+
+~~~~
+evaluate: x
+	| res |
+	
+	res := 0.
+
+	1 to: (self asArray size) do: [ :i | res := res + (((self asArray) at: i) * (x raisedTo: (i - 1))) ].
+	
+	^ res.
+~~~~
+
+![A screenshot showing the evaluate: method.](screenshots/evaluate.png width="600px")
+
+evaluate
+--------------------------------
+
+~~~~
+evaluate
+	| input x |
+	input := UIManager default request:'What value do you want to evaluate the polynomial at?'.
+	
+	x := input asNumber.
+	
+	^ self evaluate: x.
+~~~~
+
+![A screenshot showing the evaluate method.](screenshots/evaluate2.png width="600px")
+
+differentiate
+--------------------------------
+
+~~~~
+differentiate
+	| res |
+	
+	res := OrderedCollection new.
+	
+	2 to: self asArray size do: [ :i |
+		res addLast: (i - 1) * (self asArray at: i)
+	].
+
+	^ self class new initialize: res asArray.
+~~~~
+
+![A screenshot showing the differentiate method.](screenshots/diff.png width="600px")
+
+
+graphFrom:graphTo:
+--------------------------------
+
+~~~~
+graphFrom: a graphTo: b
+	| c p xs ys |
+ 
+	xs := a to: b count: 100.
+	ys := xs collect: [ :x | self evaluate: x ].
+ 
+	c := RSCompositeChart new.
+	p := RSLinePlot new x: xs y: ys.
+	c add: p.
+	c title: 'Graph of the polynomial'.
+	c xlabel: 'x'.
+	c ylabel: 'y'.
+	c addDecoration: RSHorizontalTick new.
+	c addDecoration: RSVerticalTick new.
+	c inspect.
+~~~~
+
+![A screenshot showing the graphing method.](screenshots/graph.png width="600px")
+
+initialize:
+--------------------------------
+
+~~~~
+initialize: initValue
+	"private: initialize coefficient instance variable"
+
+	(initValue isKindOf: (self class))
+		ifTrue: [ coefficient := (initValue asArray) deepCopy ]
+		ifFalse: [
+			(initValue isKindOf: Array)
+				ifTrue: [ coefficient := initValue deepCopy ]
+				ifFalse: [ self initialize ]
+		].
+	
+	[(self asArray at: self asArray size) = 0] whileTrue: [
+		| collection |
+		
+		collection := self asArray asOrderedCollection.
+		collection removeLast.
+		coefficient := collection asArray.
+	]
+~~~~
+
+![A screenshot showing the graphing method.](screenshots/init.png width="600px")
+
+Testing
+======================
+
+~~~~
+| p |
+p := Polynomial new initialize: #(-7 5 0 3 0 0 0).
+q := Polynomial new initialize: #(2 3 1).
+Transcript open ; clear.
+
+"Testing initialize"
+Transcript show: 'p asArray = #(-7 5 0 3) -> '.
+Transcript show: p asArray.
+Transcript cr.
+Transcript show: 'q asArray = #(2 3 1) -> '.
+Transcript show: q asArray.
+Transcript cr.
+
+"Testing sum"
+Transcript show: '(p sum: q) asArray = #(-5 8 1 3) -> '.
+Transcript show: (p sum: q) asArray.
+Transcript cr.
+
+"Testing evaluate"
+Transcript show: 'p evaluate: 2 = 27 -> '.
+Transcript show: (p evaluate: 2).
+Transcript cr.
+
+"Testing prompt evaluate (run with 2)"
+Transcript show: 'p evaluate = 27 -> '.
+Transcript show: p evaluate.
+Transcript cr.
+
+"Testing differentiate"
+Transcript show: '(q differentiate) asArray = #(3 2) -> '.
+Transcript show: (q differentiate) asArray.
+Transcript cr.
+
+"Graph should look like a reflected, tilted, and softened S"
+p graphFrom: -10 graphTo: 10.
+~~~~
+
+![A screenshot showing the tests running.](screenshots/tests.png width="600px")
+
+Assignment Reflection
+======================
+
+This assignment was very easy but I found Pharo a little bit annoying,
+possibly due to the lack of documentation online.
+Although I really appreciate the idea of pure object-oriented programming,
+I think that implementing a little bit of syntactic sugar to make it feel
+more like other programming languages wouldn't hurt anyone.
+
+I used OrderedCollection in several of the methods because I found the method addLast
+to be quite convenient, specially given that I could then convert it to an array very easily.
+
+<!--
+How do the languages compare to one another?
+Which language was your favorite?  Which was your least favorite?
+What type of problems would each language be good at solving?
+When you had a choice of language, why did you decide on the language in which you implemented your solution?
+If you worked with a partnor, how did you decide to split up the work?
+
+List any other comments below.
+Feel free to provide any feedback on how much you learned from doing the assignment, and whether you enjoyed doing it.
+-->
+
+<!--   Feel free to modify the following to fit a theme of your choosing   -->
+<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet"> <!-- a sans-serif font -->
+<style>  /* A TAYLOR-INSPIRED THEME */
+    body {font-family:'Open Sans',sans-serif;}
+    .md a:link, .md a:visited {color:hsl(252,23.0%,44.3%); font-family:'Open Sans',sans-serif;}
+    .md table.table th {background-color:hsl(252,23.0%,44.3%);}
+    .md .noheader th {display:none;}
+    .md .firstcol td:first-child {white-space:pre;color:white;vertical-align:top;font-weight:bold;border-color:black;background:hsl(252,23.0%,54.3%);}
+    .md .firstcol tr:nth-child(even) td:first-child {background:hsl(252,23.0%,44.3%);}
+</style>
+
+
+<!-- ****************************** -->
+<!--    Leave the content below     -->
+<!-- ****************************** -->
+
+<!-- The script and style below are added for clarity and to workaround a bug -->
+<script>
+    // this is a hack to workaround a bug in Markdeep+Mathjax, where
+    // `$`` is automatically converted to `\(`` and `\)`` too soon.
+    // the following code will replace the innerHTML of all elements
+    // with class "dollar" with a dollar sign.
+    setTimeout(function() {
+        var dollars = document.getElementsByClassName('dollar');
+        for(var i = 0; i < dollars.length; i++) {
+            dollars[i].innerHTML = '&#' + '36;'; // split to prevent conversion to $
+        }
+    }, 1000);
+</script>
+<style>
+    /* adding some styling to <code> tags (but not <pre><code> coding blocks!) */
+    :not(pre) > code {
+        background-color: rgba(0,0,0,0.05);
+        outline: 1px solid rgba(0,0,0,0.15);
+        margin-left: 0.25em;
+        margin-right: 0.25em;
+    }
+    /* fixes table of contents of medium-length document from looking weird if admonitions are behind */
+    .md div.mediumTOC { background: white; }
+    .md div.admonition { position: initial !important; }
+</style>
+
+<!--   Leave the following Markdeep formatting code, as this will format your text above to look nice in a wed browser   -->
+
+<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
