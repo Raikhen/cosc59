@@ -1,0 +1,332 @@
+**A11 - Logic Programming**
+
+
+Author
+=============
+
+<div class="noheader firstcol">
+                  |             
+------------------|-------------
+name              | Dylan Fridman
+computer + OS     | MacBook Air, MacOS Sonoma
+time to complete  | 4 hours
+</div>
+
+Code
+================
+
+~~~~
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% tree.pl
+% https://gfx.cse.taylor.edu/courses/cos382/assignments/11_Paradigm_LogicProlog
+% The goal of this assignment is to write a collection of Prolog rules
+% to represent and manipulate binary trees.
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Starter code
+
+% binary_tree(Tree)
+% - Tree is a binary tree.
+
+binary_tree(void).
+binary_tree(tree(_, Left, Right)) :-
+        binary_tree(Left),
+        binary_tree(Right).
+
+% tree_member(Tree, Element)
+% - Element is an element of the binary tree Tree.
+
+tree_member(tree(X, _, _), X).
+tree_member(tree(_, Left, _), X)  :- tree_member(Left, X).
+tree_member(tree(_, _, Right), X) :- tree_member(Right, X).
+
+% preorder(Tree, Pre)
+% - Pre is a list of elements of Tree accumulated during a preorder traversal.
+
+preorder(tree(X, L, R), Xs) :-
+        preorder(L, Ls),
+        preorder(R, Rs),
+        append([X|Ls], Rs, Xs).
+preorder(void, []).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Sample trees
+
+%
+%    tree1       tree2         tree3
+%
+%      1           4             1
+%     / \         / \           / \
+%    2   3       5   6         2   3
+%                             / \
+%                            5   6
+%                               /
+%                              7
+%
+
+tree1(tree(1,tree(2,void,void),tree(3,void,void))).
+tree2(tree(4,tree(5,void,void),tree(6,void,void))).
+tree3(
+        tree(   1,
+                tree(   2,
+                        tree(5,void,void),
+                        tree(   6,
+                                tree(7,void,void),
+                                void
+                        )
+                ),
+                tree(3,void,void)
+        )
+).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Place your code here
+
+% inorder/2
+
+inorder(void, []).
+
+inorder(tree(X, L, R), Xs) :-
+        inorder(L, Ls),
+        inorder(R, Rs),
+        append(Ls, [X | Rs], Xs).
+
+% subtree/2
+
+subtree(T, T) :- binary_tree(T).
+
+subtree(tree(_, L, R), T) :-
+        subtree(L, T),
+        binary_tree(R).
+
+subtree(tree(_, L, R), T) :-
+        subtree(R, T),
+        binary_tree(L).
+
+% sumtree/2
+
+sumtree(void, 0).
+
+sumtree(tree(X, L, R), S) :-
+        sumtree(L, N),
+        sumtree(R, M),
+        S is X + M + N.
+
+% ordered/1
+
+% I'm quite confused as to why this predicate was called ordered
+% and not something like alldistinct or noreps...
+
+not_in(_, void).
+
+not_in(X, tree(Y, L, R)) :-
+        \+ X = Y,
+        not_in(X, L),
+        not_in(X, R).
+
+disjoint(void, _).
+
+disjoint(tree(X, L, R), T) :-
+        not_in(X, T),
+        disjoint(L, T),
+        disjoint(R, T).
+
+ordered(void).
+
+ordered(tree(X, L, R)) :-
+        not_in(X, L),
+        not_in(X, R),
+        ordered(L),
+        ordered(R),
+        disjoint(L, R).
+
+% substitute/4
+
+substitute(void, _, void, _).
+
+substitute(tree(X, LX, RX), X, tree(Y, LY, RY), Y) :-
+        substitute(LX, X, LY, Y),
+        substitute(RX, X, RY, Y).
+
+substitute(tree(Z, L1, R1), X, tree(Z, L2, R2), Y) :-
+        substitute(L1, X, L2, Y),
+        substitute(R1, X, R2, Y).
+
+% pathto
+
+pathto(tree(N, L, R), N, [N]) :-
+        binary_tree(L),
+        binary_tree(R).
+
+pathto(tree(_, L, R), N, [left | T]) :-
+        pathto(L, N, T),
+        binary_tree(R).
+
+pathto(tree(_, L, R), N, [right | T]) :-
+        pathto(R, N, T),
+        binary_tree(L).
+
+% Also, why are some of the predicates written likethis and some like_this?
+
+% Additional test data
+tree4(tree(8, T2, T3)) :-
+        tree2(T2),
+        tree3(T3).
+~~~~
+
+Testing
+======================
+
+~~~~
+set_prolog_flag(answer_write_options,[max_depth(0)]). % Show every element in a list
+
+% inorder
+inorder(void, L). % L = []
+tree4(T), inorder(T, L). % L = [5, 4, 6, 8, 5, 2, 7, 6, 1, 3].
+inorder(4, L). % false
+inorder(tree(4, 4, 4), L). % false
+
+% subtree
+subtree(4, void). % false.
+subtree(4, 4). % false.
+tree4(T1), tree2(T2), subtree(T1, T2). % true.
+tree4(T1), tree2(T2), subtree(T2, T1). % false.
+subtree(tree(5, void, void), 5). % false
+subtree(tree(5, void, void), tree(5, void, void)). % true
+subtree(tree(5, tree(1, void, void), void), tree(1, void, void)). % true
+subtree(tree(5, tree(1, void, void), void), tree(5, void, void)). % false
+
+% sumtree
+tree4(T), sumtree(T, S). % S = 47
+sumtree(void, S). % S = 0
+sumtree([1, 2, 3], _). % false
+sumtree(tree(1, 2, void), _). % false
+sumtree(tree(1, void, 3), _). % false
+
+% ordered
+tree1(T), ordered(T). % true
+tree2(T), ordered(T). % true
+tree3(T), ordered(T). % true
+tree4(T), ordered(T). % false
+ordered(void). % true
+ordered(tree(1, 2, 3)). % false
+ordered(4). % false
+ordered(tree(1, tree(2, void, void), tree(2, void, void))). % false
+ordered(tree(1, tree(2, void, void), tree(3, void, void))). % true
+ordered(tree(1, tree(2, void, void), tree(3, tree(2, void, void), void))). % false
+
+% substitute
+tree1(T1), substitute(T1, 1, T2, 2).
+
+%  Should be:
+%
+%      T2
+%
+%      2
+%     / \
+%    2   3
+%
+
+
+tree1(T1), substitute(T1, 2, T2, 1).
+
+%  Should be:
+%
+%      T2
+%
+%      1
+%     / \
+%    1   3
+%
+
+tree1(T1), substitute(T1, 4, T2, 2).
+
+%  Should be:
+%
+%      T2
+%
+%      1
+%     / \
+%    2   3
+%
+
+tree4(T1), substitute(T1, 4, void, 2). % false
+tree4(T1), substitute(void, 4, T1, 2). % false
+
+% pathto
+tree1(T), pathto(T, 1, P). % P = [1],
+tree1(T), pathto(T, 2, P). % P = [left, 2]
+tree3(T), pathto(T, 6, P). % P = [left, right, 6]
+tree3(T), pathto(T, X, [left, right, X]). % 6
+tree4(T), pathto(T, 5, P). % [left, left, 5] and [right, left, left, 5]
+tree1(T), pathto(T, 4, P). % false
+~~~~
+
+![First screenshot showing the tests running.](screenshots/1.png width="600px")
+![Second screenshot showing the tests running.](screenshots/2.png width="600px")
+![Third screenshot showing the tests running.](screenshots/3.png width="600px")
+
+Assignment Reflection
+======================
+
+I'm really happy about having learned Prolog or logic programming in general,
+it's clearly very powerful to have that in many cases solving a problem
+is equivalent to defining it.
+
+<!--
+How do the languages compare to one another?
+Which language was your favorite?  Which was your least favorite?
+What type of problems would each language be good at solving?
+When you had a choice of language, why did you decide on the language in which you implemented your solution?
+If you worked with a partnor, how did you decide to split up the work?
+
+List any other comments below.
+Feel free to provide any feedback on how much you learned from doing the assignment, and whether you enjoyed doing it.
+-->
+
+<!--   Feel free to modify the following to fit a theme of your choosing   -->
+<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet"> <!-- a sans-serif font -->
+<style>  /* A TAYLOR-INSPIRED THEME */
+    body {font-family:'Open Sans',sans-serif;}
+    .md a:link, .md a:visited {color:hsl(252,23.0%,44.3%); font-family:'Open Sans',sans-serif;}
+    .md table.table th {background-color:hsl(252,23.0%,44.3%);}
+    .md .noheader th {display:none;}
+    .md .firstcol td:first-child {white-space:pre;color:white;vertical-align:top;font-weight:bold;border-color:black;background:hsl(252,23.0%,54.3%);}
+    .md .firstcol tr:nth-child(even) td:first-child {background:hsl(252,23.0%,44.3%);}
+</style>
+
+
+<!-- ****************************** -->
+<!--    Leave the content below     -->
+<!-- ****************************** -->
+
+<!-- The script and style below are added for clarity and to workaround a bug -->
+<script>
+    // this is a hack to workaround a bug in Markdeep+Mathjax, where
+    // `$`` is automatically converted to `\(`` and `\)`` too soon.
+    // the following code will replace the innerHTML of all elements
+    // with class "dollar" with a dollar sign.
+    setTimeout(function() {
+        var dollars = document.getElementsByClassName('dollar');
+        for(var i = 0; i < dollars.length; i++) {
+            dollars[i].innerHTML = '&#' + '36;'; // split to prevent conversion to $
+        }
+    }, 1000);
+</script>
+<style>
+    /* adding some styling to <code> tags (but not <pre><code> coding blocks!) */
+    :not(pre) > code {
+        background-color: rgba(0,0,0,0.05);
+        outline: 1px solid rgba(0,0,0,0.15);
+        margin-left: 0.25em;
+        margin-right: 0.25em;
+    }
+    /* fixes table of contents of medium-length document from looking weird if admonitions are behind */
+    .md div.mediumTOC { background: white; }
+    .md div.admonition { position: initial !important; }
+</style>
+
+<!--   Leave the following Markdeep formatting code, as this will format your text above to look nice in a wed browser   -->
+
+<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
