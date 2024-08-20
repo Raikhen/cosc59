@@ -5,18 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4fb7ca58-9769-4091-bbc5-8b762fb8fdc1" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../../A00/csharp/obj/Debug/net8.0/c#.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Expr/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Expr/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Expr/inputs/test.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Expr/inputs/test.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Expr/out/production/Expr/EntireFile.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Expr/out/production/Expr/ErrorHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Expr/src/EntireFile.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Expr/src/ErrorHandler.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/inputs/test.txt" beforeDir="false" afterPath="$PROJECT_DIR$/inputs/test.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Expr/Listener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Expr/Listener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Listener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Listener.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -129,6 +119,7 @@
       <workItem from="1720960276929" duration="20897000" />
       <workItem from="1721231073294" duration="2338000" />
       <workItem from="1721268917689" duration="1472000" />
+      <workItem from="1723305343162" duration="1709000" />
     </task>
     <servers />
   </component>

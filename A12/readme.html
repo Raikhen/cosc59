@@ -1,0 +1,269 @@
+**A12 - Functional Programming**
+
+Author
+=============
+
+<div class="noheader firstcol">
+                  |             
+------------------|-------------
+name              | Dylan Fridman
+computer + OS     | MacBook Air, MacOS Sonoma
+time to complete  | 8 hours
+</div>
+
+Moessner Powers and Factorial
+================================
+
+Implementation
+--------------------------------
+
+~~~~
+-- Skip every n-th element
+skipEveryN :: Integer -> [Integer] -> [Integer]
+skipEveryN n list = skipHelper n list 1
+  where
+    skipHelper :: Integer -> [Integer] -> Integer -> [Integer]
+    skipHelper _ [] _ =  []
+    skipHelper n (x : xs) k =
+      if n == k then
+        skipHelper n xs 1
+      else
+        x : skipHelper n xs (k + 1)
+
+-- Running sum in O(n)
+runningSum :: [Integer] -> [Integer]
+runningSum xs = helper xs 0
+  where
+    helper [] acc = []
+    helper (x : xs) acc = (x + acc) : helper xs (x + acc)
+
+-- Moessner Powers
+moessnerPowers :: Integer -> [Integer]
+moessnerPowers = skipAndRun [1 ..]
+  where
+    skipAndRun :: [Integer] -> Integer -> [Integer]
+    skipAndRun list 1 = list
+    skipAndRun list n = skipAndRun (runningSum (skipEveryN n list)) (n - 1)
+
+-- Skip the elements on triangular indices
+skipGrowing :: [Integer] -> [Integer]
+skipGrowing list = helper list 0 1
+  where
+    helper :: [Integer] -> Integer -> Integer -> [Integer]
+    helper [] _ _ = []
+    helper (x : xs) 0 k = helper xs k (k + 1)
+    helper (x : xs) n k = x : helper xs (n - 1) k
+
+-- Moessner Factorial
+moessnerFactorial :: [Integer]
+moessnerFactorial = map (head . row) [0 ..]
+  where
+    row :: Integer -> [Integer]
+    row 0 = [1 ..]
+    row n = runningSum (skipGrowing (row (n - 1)))
+~~~~
+
+Testing
+--------------------------------
+
+~~~~
+runningSum [2 * k | k <- [1 .. 10]]
+skipEveryN 2 [1 .. 50]
+skipEveryN 3 [1 .. 50]
+skipGrowing [1 .. 50]
+[ moessnerPowers 2 !! k | k <- [0 .. 10] ]
+[ moessnerPowers 3 !! k | k <- [0 .. 10] ]
+[ moessnerFactorial !! k | k <- [0 .. 10] ]
+~~~~
+
+![First screenshot showing the tests running.](screenshots/main.png width="600px")
+
+Extra credit
+================
+
+Implementation
+--------------------------------
+
+~~~~
+-- Mergesort
+mergesort :: [Integer] -> [Integer]
+mergesort [] = []
+mergesort [x] = [x]
+mergesort [x, y] = if x > y then [y, x] else [x, y]
+mergesort list = merge (mergesort first) (mergesort second)
+  where
+    m  = div (length list) 2
+    n = length list - m
+    first = take m list
+    second = take n (drop m list)
+
+    -- Merge procedure
+    merge xs [] = xs
+    merge [] ys = ys
+    merge (x : xs) (y : ys) =
+      if x < y then
+        x : merge xs (y : ys)
+      else
+        y : merge (x : xs) ys
+
+selection :: [Integer] -> Integer
+selection list =
+  if length list > 5 then
+    selection (map pickMiddle (intoChunksOfFive list))
+  else
+    pickMiddle list
+  where
+    pickMiddle xs = mergesort xs !! div (length xs ) 2
+    intoChunksOfFive xs =
+      if length xs <= 5 then
+        [xs]
+      else
+        take 5 xs : intoChunksOfFive (drop 5 xs)
+
+-- Quicksort
+quicksort :: [Integer] -> [Integer]
+quicksort [] = []
+quicksort list = helper list (pivot list)
+  where
+    -- Picks the best pivot of given a list
+    pivot ys =
+      if length ys > 5 then
+        pivot (map pickMiddle (intoChunksOfFive ys))
+      else
+        pickMiddle ys
+
+    -- Picks the middle element of a short list
+    pickMiddle xs = mergesort xs !! div (length xs ) 2
+
+    -- Splits a list into chunks of five elements
+    intoChunksOfFive xs =
+      if length xs <= 5 then
+        [xs]
+      else
+        take 5 xs : intoChunksOfFive (drop 5 xs)
+
+    small = quicksort [e | e <- list, e < pivot list]
+    equal = [e | e <- list, e == pivot list]
+    big = quicksort [e | e <- list, e > pivot list]
+    helper list pivot = small ++ equal ++ big
+
+-- Translate expression to reverse polish notation
+infix2rpn :: String -> String
+infix2rpn input = parseTerms (map parseFactors metaList)
+  where
+    metaList = map intoFactors (intoTerms input)
+
+    parseFactors [] = ""
+    parseFactors [x] = x
+    parseFactors (x : xs) = x ++ " " ++ parseFactors xs ++ " *"
+
+    parseTerms [] = ""
+    parseTerms [x] = x
+    parseTerms (x : xs) = x ++ " " ++ parseTerms xs ++ " +"
+
+    intoTerms str = intoTermsHelper str ""
+    intoTermsHelper "" term = [term]
+    intoTermsHelper ('+' : xs) term = term : intoTermsHelper xs ""
+    intoTermsHelper (' ' : xs) term = intoTermsHelper xs term
+    intoTermsHelper (x : xs) term = intoTermsHelper xs (x : term)
+
+    intoFactors str = intoFactorsHelper str ""
+    intoFactorsHelper "" term = [term]
+    intoFactorsHelper ('*' : xs) term = term : intoFactorsHelper xs ""
+    intoFactorsHelper (' ' : xs) term = intoFactorsHelper xs term
+    intoFactorsHelper (x : xs) term = intoFactorsHelper xs (x : term)
+
+-- Evaluate an expression in reverse polish notation
+evalrpn :: String -> Int
+evalrpn str = fst (evalWithLeftover (words str))
+  where
+    evalWithLeftover [x] = (read x, [])
+    evalWithLeftover xs
+      | last xs == "+" =
+        let prev = evalWithLeftover (init xs)
+        in (fst prev + fst (evalWithLeftover (snd prev)), snd (evalWithLeftover (snd prev)))
+      | last xs == "*" = 
+        let prev = evalWithLeftover (init xs)
+        in (fst prev * fst (evalWithLeftover (snd prev)), snd (evalWithLeftover (snd prev)))
+      | otherwise = (read (last xs), init xs)
+~~~~
+
+Testing
+--------------------------------
+
+~~~~
+mergesort [4, 3, 2, 1, 2, 3, 4]
+mergesort [3, 2, 1]
+mergesort [1, 2, 3]
+mergesort []
+quicksort [4, 3, 2, 1, 2, 3, 4]
+quicksort [3, 2, 1]
+quicksort [1, 2, 3]
+quicksort []
+infix2rpn "1 + 2 * 3 + 4 * 5 + 10"
+evalrpn "1 3 2 * 5 4 * 10 + + +" -- 37
+~~~~
+
+![First screenshot showing the tests running.](screenshots/extra.png width="600px")
+
+Assignment Reflection
+======================
+
+List comprehensions are pretty neat, it was cool to see Haskell's lazy/leftmost evaluation in action.
+
+<!--
+How do the languages compare to one another?
+Which language was your favorite?  Which was your least favorite?
+What type of problems would each language be good at solving?
+When you had a choice of language, why did you decide on the language in which you implemented your solution?
+If you worked with a partnor, how did you decide to split up the work?
+
+List any other comments below.
+Feel free to provide any feedback on how much you learned from doing the assignment, and whether you enjoyed doing it.
+-->
+
+<!--   Feel free to modify the following to fit a theme of your choosing   -->
+<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet"> <!-- a sans-serif font -->
+<style>  /* A TAYLOR-INSPIRED THEME */
+    body {font-family:'Open Sans',sans-serif;}
+    .md a:link, .md a:visited {color:hsl(252,23.0%,44.3%); font-family:'Open Sans',sans-serif;}
+    .md table.table th {background-color:hsl(252,23.0%,44.3%);}
+    .md .noheader th {display:none;}
+    .md .firstcol td:first-child {white-space:pre;color:white;vertical-align:top;font-weight:bold;border-color:black;background:hsl(252,23.0%,54.3%);}
+    .md .firstcol tr:nth-child(even) td:first-child {background:hsl(252,23.0%,44.3%);}
+</style>
+
+
+<!-- ****************************** -->
+<!--    Leave the content below     -->
+<!-- ****************************** -->
+
+<!-- The script and style below are added for clarity and to workaround a bug -->
+<script>
+    // this is a hack to workaround a bug in Markdeep+Mathjax, where
+    // `$`` is automatically converted to `\(`` and `\)`` too soon.
+    // the following code will replace the innerHTML of all elements
+    // with class "dollar" with a dollar sign.
+    setTimeout(function() {
+        var dollars = document.getElementsByClassName('dollar');
+        for(var i = 0; i < dollars.length; i++) {
+            dollars[i].innerHTML = '&#' + '36;'; // split to prevent conversion to $
+        }
+    }, 1000);
+</script>
+<style>
+    /* adding some styling to <code> tags (but not <pre><code> coding blocks!) */
+    :not(pre) > code {
+        background-color: rgba(0,0,0,0.05);
+        outline: 1px solid rgba(0,0,0,0.15);
+        margin-left: 0.25em;
+        margin-right: 0.25em;
+    }
+    /* fixes table of contents of medium-length document from looking weird if admonitions are behind */
+    .md div.mediumTOC { background: white; }
+    .md div.admonition { position: initial !important; }
+</style>
+
+<!--   Leave the following Markdeep formatting code, as this will format your text above to look nice in a wed browser   -->
+
+<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
